@@ -1,9 +1,9 @@
-export type PackageType = '3_months' | '6_months' | '12_months'
+export type PackageType = '3_months' | '6_months' | 'online_coaching'
 
 export const PACKAGES = {
-  '3_months': { label: '3 maanden', price: 350, months: 3 },
-  '6_months': { label: '6 maanden', price: 650, months: 6 },
-  '12_months': { label: '12 maanden', price: 1200, months: 12 },
+  '3_months': { label: '3 maanden', price: 499, months: 3 },
+  '6_months': { label: '6 maanden', price: 899, months: 6 },
+  'online_coaching': { label: 'Online coaching', price: 349, months: 3 },
 } as const
 
 export interface Client {

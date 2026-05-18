@@ -24,11 +24,12 @@ const S = {
   grid: (cols: string) => ({ display: 'grid', gridTemplateColumns: cols, gap: '12px' }),
 }
 
-export default function NewAppointmentForm({ clients }: { clients: Pick<Client, 'id' | 'full_name'>[] }) {
+export default function NewAppointmentForm({ clients }: { clients: Pick<Client, 'id' | 'full_name' | 'email'>[] }) {
   const router = useRouter()
   const supabase = createClient()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [calStatus, setCalStatus] = useState<'idle' | 'ok' | 'warn'>('idle')
   const [form, setForm] = useState({ ...EMPTY })
 
   function set(key: string, value: string) {
@@ -37,12 +38,14 @@ export default function NewAppointmentForm({ clients }: { clients: Pick<Client, 
 
   function cancel() {
     setOpen(false)
+    setCalStatus('idle')
     setForm({ ...EMPTY })
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
+
     const { error } = await supabase.from('appointments').insert({
       client_id: form.client_id || null,
       title: form.title,
@@ -53,10 +56,40 @@ export default function NewAppointmentForm({ clients }: { clients: Pick<Client, 
       location: form.location || null,
       notes: form.notes || null,
     })
+
+    if (error) {
+      setLoading(false)
+      alert(error.message)
+      return
+    }
+
+    // Google Calendar event aanmaken
+    const client = clients.find(c => c.id === form.client_id)
+    try {
+      const res = await fetch('/api/google/create-event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: form.title,
+          date: form.appointment_date,
+          time: form.appointment_time || undefined,
+          durationMinutes: form.duration_minutes ? Number(form.duration_minutes) : 60,
+          location: form.location || undefined,
+          notes: form.notes || undefined,
+          clientEmail: client?.email,
+          clientName: client?.full_name,
+        }),
+      })
+      setCalStatus(res.ok ? 'ok' : 'warn')
+    } catch {
+      setCalStatus('warn')
+    }
+
     setLoading(false)
-    if (error) { alert(error.message); return }
-    cancel()
     router.refresh()
+
+    // Sluit formulier na korte bevestiging
+    setTimeout(() => cancel(), 1800)
   }
 
   return (
@@ -131,6 +164,22 @@ export default function NewAppointmentForm({ clients }: { clients: Pick<Client, 
               <textarea value={form.notes} onChange={e => set('notes', e.target.value)} rows={2} placeholder="..." />
             </div>
           </div>
+
+          {calStatus !== 'idle' && (
+            <div style={{
+              marginTop: '14px',
+              padding: '10px 14px',
+              borderRadius: '8px',
+              fontSize: '0.8rem',
+              background: calStatus === 'ok' ? 'rgba(34,197,94,0.08)' : 'rgba(245,158,11,0.1)',
+              color: calStatus === 'ok' ? '#16A34A' : '#B45309',
+              border: `1px solid ${calStatus === 'ok' ? 'rgba(34,197,94,0.25)' : 'rgba(245,158,11,0.3)'}`,
+            }}>
+              {calStatus === 'ok'
+                ? '✓ Afspraak toegevoegd aan Google Agenda — uitnodiging verstuurd naar klant'
+                : '⚠ Afspraak opgeslagen, maar Google Agenda synchronisatie mislukt'}
+            </div>
+          )}
 
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '20px' }}>
             <button type="button" onClick={cancel} style={{

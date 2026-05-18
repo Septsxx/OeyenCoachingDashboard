@@ -35,8 +35,8 @@ export default async function AgendaPage() {
       .order('appointment_time', { ascending: true }) as unknown as Promise<{ data: AppointmentWithClient[] | null }>,
     supabase
       .from('clients')
-      .select('id, full_name')
-      .order('full_name') as unknown as Promise<{ data: Pick<Client, 'id' | 'full_name'>[] | null }>,
+      .select('id, full_name, email')
+      .order('full_name') as unknown as Promise<{ data: Pick<Client, 'id' | 'full_name' | 'email'>[] | null }>,
   ])
 
   const all = appointmentsRaw ?? []
@@ -61,7 +61,7 @@ export default async function AgendaPage() {
 
       <CalendarView appointments={all} />
 
-      <NewAppointmentForm clients={clients ?? []} />
+      <NewAppointmentForm clients={(clients ?? []) as Pick<Client, 'id' | 'full_name' | 'email'>[]} />
 
       {upcoming.length === 0 && past.length === 0 && (
         <div style={{ textAlign: 'center', padding: '64px', color: 'var(--text-faint)' }}>
@@ -99,7 +99,7 @@ export default async function AgendaPage() {
   )
 }
 
-function DateGroup({ date, items, clients, dim = false }: { date: string; items: AppointmentWithClient[]; clients: Pick<Client, 'id' | 'full_name'>[]; dim?: boolean }) {
+function DateGroup({ date, items, clients, dim = false }: { date: string; items: AppointmentWithClient[]; clients: Pick<Client, 'id' | 'full_name' | 'email'>[]; dim?: boolean }) {
   const parsed = parseISO(date)
   const isToday = format(parsed, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')
 
