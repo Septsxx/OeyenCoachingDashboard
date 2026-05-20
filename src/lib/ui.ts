@@ -2,20 +2,20 @@ import type { CSSProperties } from 'react'
 
 export const LABEL: CSSProperties = {
   display: 'block',
-  fontSize: '0.72rem',
+  fontSize: '0.75rem',
   fontWeight: 500,
-  color: 'var(--text-dim)',
+  color: 'var(--text-muted)',
   textTransform: 'uppercase',
-  letterSpacing: '0.8px',
-  marginBottom: '6px',
+  letterSpacing: '0.6px',
+  marginBottom: '8px',
 }
 
 export const SECTION_TITLE: CSSProperties = {
-  fontSize: '0.7rem',
+  fontSize: '0.72rem',
   fontWeight: 600,
-  color: 'var(--text-faint)',
+  color: 'var(--text-dim)',
   textTransform: 'uppercase',
-  letterSpacing: '1.5px',
+  letterSpacing: '1.2px',
   marginBottom: '16px',
 }
 

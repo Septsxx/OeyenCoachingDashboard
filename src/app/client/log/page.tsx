@@ -20,8 +20,8 @@ function calcSleepMinutes(sleepTime: string, wakeTime: string): number | null {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px', marginBottom: '16px' }}>
-      <p style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px' }}>{title}</p>
+    <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '20px', marginBottom: '16px' }}>
+      <p style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1.2px', marginBottom: '18px' }}>{title}</p>
       {children}
     </div>
   )
@@ -256,7 +256,7 @@ export default function DailyLogPage() {
       <form onSubmit={handleSave}>
 
         <Section title="Biometrie">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+          <div className="cols-3">
             <div>
               <label style={LABEL}>Gewicht (kg)</label>
               <input type="number" step="0.1" value={form.weight_kg} onChange={e => set('weight_kg', e.target.value)} placeholder="75.0" />
@@ -273,11 +273,11 @@ export default function DailyLogPage() {
         </Section>
 
         <Section title="Voeding">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+          <div className="cols-2" style={{ marginBottom: '16px' }}>
             <ScoreSelect label="Voedingsadherentie" value={form.nutrition_adherence} onChange={v => set('nutrition_adherence', v)} />
             <ScoreSelect label="Hongergevoel" value={form.hunger_score} onChange={v => set('hunger_score', v)} />
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div className="cols-2">
             <div>
               <label style={LABEL}>Off-plan maaltijden</label>
               <input value={form.off_plan_meals} onChange={e => set('off_plan_meals', e.target.value)} placeholder="Bv. pizza op vrijdag" />
@@ -293,7 +293,7 @@ export default function DailyLogPage() {
         </Section>
 
         <Section title="Training">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+          <div className="cols-2" style={{ marginBottom: '16px' }}>
             <div>
               <label style={LABEL}>Stappen</label>
               <input type="number" value={form.steps} onChange={e => set('steps', e.target.value)} placeholder="8000" />
@@ -303,7 +303,7 @@ export default function DailyLogPage() {
               <input type="number" value={form.cardio_minutes} onChange={e => set('cardio_minutes', e.target.value)} placeholder="30" />
             </div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+          <div className="cols-3" style={{ marginBottom: '16px' }}>
             <div>
               <label style={LABEL}>Krachttraining</label>
               <select value={form.resistance_training} onChange={e => set('resistance_training', e.target.value)}>
@@ -322,7 +322,7 @@ export default function DailyLogPage() {
         </Section>
 
         <Section title="Slaap">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+          <div className="cols-3" style={{ marginBottom: '16px' }}>
             <div>
               <label style={LABEL}>Slaaptijd</label>
               <input type="time" value={form.sleep_time} onChange={e => set('sleep_time', e.target.value)} />
@@ -336,7 +336,7 @@ export default function DailyLogPage() {
               <input readOnly value={sleepDisplay ?? ''} placeholder="auto" style={{ color: sleepDisplay ? 'var(--text)' : 'var(--text-faint)' }} />
             </div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div className="cols-2">
             <ScoreSelect label="Slaapkwaliteit" value={form.sleep_quality} onChange={v => set('sleep_quality', v)} />
             <div>
               <label style={LABEL}>Slaapnotities</label>
@@ -346,7 +346,7 @@ export default function DailyLogPage() {
         </Section>
 
         <Section title="Biofeedback">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div className="cols-2">
             <ScoreSelect label="Energieniveau" value={form.energy_levels} onChange={v => set('energy_levels', v)} />
             <ScoreSelect label="Stressniveau" value={form.stress_levels} onChange={v => set('stress_levels', v)} />
           </div>

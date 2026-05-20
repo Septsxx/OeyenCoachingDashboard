@@ -41,6 +41,7 @@ body {
   color: var(--text);
   font-family: system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
 }
 
 ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -52,12 +53,28 @@ input, select, textarea {
   border: 1px solid var(--border-2);
   color: var(--text);
   border-radius: 8px;
-  padding: 10px 14px;
+  padding: 11px 14px;
   width: 100%;
-  font-size: 0.875rem;
+  font-size: 1rem;
+  min-height: 44px;
   outline: none;
   transition: border-color 0.15s;
 }
 input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 input::placeholder, textarea::placeholder { color: var(--text-faint); }
 select option { background: var(--surface-2); }
+
+/* Responsive form grids */
+.cols-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.cols-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.macro-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+@media (max-width: 500px) {
+  .cols-3 { grid-template-columns: 1fr 1fr; }
+  .macro-cards {
+    grid-template-columns: repeat(3, minmax(130px, 1fr));
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+}

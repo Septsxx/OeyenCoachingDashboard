@@ -91,7 +91,7 @@ export default async function MaaltijdplanPage() {
       {!plan.water_target && <div style={{ marginBottom: '24px' }} />}
 
       {/* Macro targets overview */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '28px' }}>
+      <div className="macro-cards" style={{ marginBottom: '28px' }}>
         {dayTypes.map(dt => {
           const key = dt.toLowerCase() as 'td' | 'rd' | 'low'
           const kcal = (plan as any)[`cals_${key}`] as number | null

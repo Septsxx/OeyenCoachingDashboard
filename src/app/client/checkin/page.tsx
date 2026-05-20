@@ -101,8 +101,8 @@ export default function CheckinPage() {
 
         {/* Training context */}
         <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px', marginBottom: '24px' }}>
-          <p style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px' }}>Trainingscontext</p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <p style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1.2px', marginBottom: '16px' }}>Trainingscontext</p>
+          <div className="cols-2">
             <div>
               <label style={LABEL}>Weken op huidig schema</label>
               <input
