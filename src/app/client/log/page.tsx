@@ -30,7 +30,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function ScoreSelect({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
     <div>
-      <label style={LABEL}>{label} (1–5)</label>
+      <label style={LABEL}>{label}</label>
+      <p style={{ fontSize: '0.72rem', color: 'var(--text-faint)', marginBottom: '8px', marginTop: '-4px' }}>1–5</p>
       <select value={value} onChange={e => onChange(e.target.value)}>
         <option value="">—</option>
         {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
@@ -258,7 +259,8 @@ export default function DailyLogPage() {
         <Section title="Biometrie">
           <div className="cols-3">
             <div>
-              <label style={LABEL}>Gewicht (kg)</label>
+              <label style={LABEL}>Gewicht</label>
+              <p style={{ fontSize: '0.72rem', color: 'var(--text-faint)', marginBottom: '8px', marginTop: '-4px' }}>kg</p>
               <input type="number" step="0.1" value={form.weight_kg} onChange={e => set('weight_kg', e.target.value)} placeholder="75.0" />
             </div>
             <div>
@@ -277,18 +279,19 @@ export default function DailyLogPage() {
             <ScoreSelect label="Voedingsadherentie" value={form.nutrition_adherence} onChange={v => set('nutrition_adherence', v)} />
             <ScoreSelect label="Hongergevoel" value={form.hunger_score} onChange={v => set('hunger_score', v)} />
           </div>
-          <div className="cols-2">
+          <div className="cols-2" style={{ marginBottom: '16px' }}>
             <div>
-              <label style={LABEL}>Off-plan maaltijden</label>
-              <input value={form.off_plan_meals} onChange={e => set('off_plan_meals', e.target.value)} placeholder="Bv. pizza op vrijdag" />
-            </div>
-            <div>
-              <label style={LABEL}>Stoelgang (keer/dag)</label>
+              <label style={LABEL}>Stoelgang</label>
+              <p style={{ fontSize: '0.72rem', color: 'var(--text-faint)', marginBottom: '8px', marginTop: '-4px' }}>keer/dag</p>
               <select value={form.stool_count} onChange={e => set('stool_count', e.target.value)}>
                 <option value="">—</option>
                 {['1', '2', '3', '4', '5+'].map(n => <option key={n} value={n}>{n}</option>)}
               </select>
             </div>
+          </div>
+          <div>
+            <label style={LABEL}>Off-plan maaltijden</label>
+            <textarea rows={3} value={form.off_plan_meals} onChange={e => set('off_plan_meals', e.target.value)} placeholder="Bv. pizza op vrijdag" style={{ resize: 'vertical' }} />
           </div>
         </Section>
 
