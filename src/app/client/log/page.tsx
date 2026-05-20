@@ -306,7 +306,7 @@ export default function DailyLogPage() {
               <input type="number" value={form.cardio_minutes} onChange={e => set('cardio_minutes', e.target.value)} placeholder="30" />
             </div>
           </div>
-          <div className="cols-3" style={{ marginBottom: '16px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '16px' }}>
             <div>
               <label style={LABEL}>Krachttraining</label>
               <select value={form.resistance_training} onChange={e => set('resistance_training', e.target.value)}>
