@@ -105,7 +105,7 @@ function WeightSection({ logs }: { logs: DailyLogPoint[] }) {
           <Tooltip
             {...TOOLTIP_STYLE}
             formatter={(v: any) => [`${v} kg`, 'Gewicht']}
-            labelFormatter={formatDateShort}
+            labelFormatter={(label: any) => formatDateShort(String(label))}
           />
           <Line type="monotone" dataKey="weight" stroke="#004aad" strokeWidth={2} dot={false} activeDot={{ r: 3, fill: '#004aad' }} connectNulls />
         </LineChart>
@@ -160,7 +160,7 @@ function StepsSection({ logs }: { logs: DailyLogPoint[] }) {
             <Tooltip
               {...TOOLTIP_STYLE}
               formatter={(v: any) => [v.toLocaleString('nl-BE'), 'Stappen']}
-              labelFormatter={formatDateShort}
+              labelFormatter={(label: any) => formatDateShort(String(label))}
             />
             <Line type="monotone" dataKey="steps" stroke="#22C55E" strokeWidth={2} dot={false} activeDot={{ r: 3, fill: '#22C55E' }} connectNulls />
           </LineChart>
@@ -210,7 +210,7 @@ function BFSection({ skinfolds }: { skinfolds: SkinfoldPoint[] }) {
           <Tooltip
             {...TOOLTIP_STYLE}
             formatter={(v: any) => [`${v.toFixed(1)}%`, 'BF%']}
-            labelFormatter={formatDateShort}
+            labelFormatter={(label: any) => formatDateShort(String(label))}
           />
           <Line type="monotone" dataKey="bf" stroke="#8B5CF6" strokeWidth={2} dot={{ r: 3, fill: '#8B5CF6' }} activeDot={{ r: 4 }} connectNulls />
         </LineChart>
@@ -245,7 +245,7 @@ function MiniCircChart({ data, dataKey, label, color, unit }: { data: any[]; dat
         <LineChart data={[...filtered].reverse()} margin={{ top: 2, right: 2, bottom: 0, left: 0 }}>
           <XAxis dataKey="measured_date" hide />
           <YAxis domain={[min * 0.98, max * 1.02]} hide />
-          <Tooltip {...TOOLTIP_STYLE} formatter={(v: any) => [`${v}${unit}`, label]} labelFormatter={formatDateShort} />
+          <Tooltip {...TOOLTIP_STYLE} formatter={(v: any) => [`${v}${unit}`, label]} labelFormatter={(l: any) => formatDateShort(String(l))} />
           <Line type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2} dot={false} activeDot={{ r: 2, fill: color }} connectNulls />
         </LineChart>
       </ResponsiveContainer>

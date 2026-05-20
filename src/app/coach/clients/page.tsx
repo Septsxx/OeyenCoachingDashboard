@@ -31,8 +31,8 @@ export default async function ClientsPage() {
     { data: recentLogsRaw },
     { data: lastCheckinRaw },
   ] = await Promise.all([
-    supabase.from('clients').select('*').order('full_name') as Promise<{ data: Client[] | null }>,
-    supabase.from('payments').select('*').order('payment_date', { ascending: false }) as Promise<{ data: Payment[] | null }>,
+    supabase.from('clients').select('*').order('full_name') as unknown as Promise<{ data: Client[] | null }>,
+    supabase.from('payments').select('*').order('payment_date', { ascending: false }) as unknown as Promise<{ data: Payment[] | null }>,
     supabase.from('daily_logs').select('client_id, log_date').gte('log_date', sevenDaysAgoStr).lte('log_date', todayStr),
     supabase.from('weekly_checkins').select('client_id, week_number').order('week_number', { ascending: false }).limit(200),
   ])
