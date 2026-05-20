@@ -27,11 +27,11 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   )
 }
 
-function ScoreSelect({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function ScoreSelect({ label, value, onChange, inline }: { label: string; value: string; onChange: (v: string) => void; inline?: boolean }) {
   return (
     <div>
-      <label style={LABEL}>{label}</label>
-      <p style={{ fontSize: '0.72rem', color: 'var(--text-faint)', marginBottom: '8px', marginTop: '-4px' }}>1–5</p>
+      <label style={LABEL}>{label}{inline ? ' (1–5)' : ''}</label>
+      {!inline && <p style={{ fontSize: '0.72rem', color: 'var(--text-faint)', marginBottom: '8px', marginTop: '-4px' }}>1–5</p>}
       <select value={value} onChange={e => onChange(e.target.value)}>
         <option value="">—</option>
         {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
@@ -259,8 +259,7 @@ export default function DailyLogPage() {
         <Section title="Biometrie">
           <div className="cols-3">
             <div>
-              <label style={LABEL}>Gewicht</label>
-              <p style={{ fontSize: '0.72rem', color: 'var(--text-faint)', marginBottom: '8px', marginTop: '-4px' }}>kg</p>
+              <label style={LABEL}>Gewicht (kg)</label>
               <input type="number" step="0.1" value={form.weight_kg} onChange={e => set('weight_kg', e.target.value)} placeholder="75.0" />
             </div>
             <div>
@@ -315,8 +314,8 @@ export default function DailyLogPage() {
                 <option value="false">Nee</option>
               </select>
             </div>
-            <ScoreSelect label="Krachtprestatie" value={form.strength_score} onChange={v => set('strength_score', v)} />
-            <ScoreSelect label="Motivatie" value={form.motivation_score} onChange={v => set('motivation_score', v)} />
+            <ScoreSelect label="Krachtprestatie" inline value={form.strength_score} onChange={v => set('strength_score', v)} />
+            <ScoreSelect label="Motivatie" inline value={form.motivation_score} onChange={v => set('motivation_score', v)} />
           </div>
           <div>
             <label style={LABEL}>Trainingsnotities</label>
@@ -325,7 +324,7 @@ export default function DailyLogPage() {
         </Section>
 
         <Section title="Slaap">
-          <div className="cols-3" style={{ marginBottom: '16px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
               <label style={LABEL}>Slaaptijd</label>
               <input type="time" value={form.sleep_time} onChange={e => set('sleep_time', e.target.value)} />
@@ -338,9 +337,7 @@ export default function DailyLogPage() {
               <label style={LABEL}>Slaapduur</label>
               <input readOnly value={sleepDisplay ?? ''} placeholder="auto" style={{ color: sleepDisplay ? 'var(--text)' : 'var(--text-faint)' }} />
             </div>
-          </div>
-          <div className="cols-2">
-            <ScoreSelect label="Slaapkwaliteit" value={form.sleep_quality} onChange={v => set('sleep_quality', v)} />
+            <ScoreSelect label="Slaapkwaliteit" inline value={form.sleep_quality} onChange={v => set('sleep_quality', v)} />
             <div>
               <label style={LABEL}>Slaapnotities</label>
               <input value={form.sleep_notes} onChange={e => set('sleep_notes', e.target.value)} placeholder="Bv. slecht geslapen door stress" />
