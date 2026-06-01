@@ -13,6 +13,7 @@ import SkinfoldModal from './SkinfoldModal'
 import CheckinResponseModal from './CheckinResponseModal'
 import MealPlanEditor from './MealPlanEditor'
 import WorkoutPlanEditor from './WorkoutPlanEditor'
+import ProfileEditModal from './ProfileEditModal'
 
 const TABS = [
   { id: 'overview', label: 'Overzicht' },
@@ -40,6 +41,7 @@ export default function ClientDetailTabs({
   const [tab, setTab] = useState(initialTab)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [showSkinfoldModal, setShowSkinfoldModal] = useState(false)
+  const [showProfileEdit, setShowProfileEdit] = useState(false)
   const [checkinToAnswer, setCheckinToAnswer] = useState<WeeklyCheckin | null>(null)
 
   const latestPayment = payments[0] ?? null
@@ -421,7 +423,16 @@ export default function ClientDetailTabs({
 
       {/* ── PROFILE ── */}
       {tab === 'profile' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+            <button onClick={() => setShowProfileEdit(true)} style={{
+              background: '#004aad', color: '#ffffff', padding: '8px 18px', borderRadius: '8px',
+              border: 'none', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer',
+            }}>
+              Profiel bewerken
+            </button>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
           {[
             ['Naam', client.full_name],
             ['E-mail', client.email],
@@ -446,6 +457,7 @@ export default function ClientDetailTabs({
               <p style={{ fontSize: '0.875rem', color: 'var(--text)' }}>{value as string}</p>
             </div>
           ) : null)}
+          </div>
         </div>
       )}
 
@@ -458,6 +470,9 @@ export default function ClientDetailTabs({
       )}
       {checkinToAnswer && (
         <CheckinResponseModal checkin={checkinToAnswer} onClose={() => setCheckinToAnswer(null)} />
+      )}
+      {showProfileEdit && (
+        <ProfileEditModal client={client} onClose={() => setShowProfileEdit(false)} />
       )}
     </>
   )
