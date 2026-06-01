@@ -1,7 +1,8 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
 
 type DailyLogPoint = { log_date: string; weight_kg: number | null; steps: number | null }
 type SkinfoldPoint = { measured_at: string; bf_pct: number | null }
@@ -184,14 +185,34 @@ function BFSection({ skinfolds }: { skinfolds: SkinfoldPoint[] }) {
   )
 }
 
-export default function MetingenClient({ clientId }: { clientId: string }) {
-  const supabaseRef = useRef(createClient())
-  const supabase = supabaseRef.current
+const supabase = createClient()
 
+export default function MetingenClient() {
+  const router = useRouter()
+  const [clientId, setClientId] = useState<string | null>(null)
   const [dailyLogs, setDailyLogs] = useState<DailyLogPoint[]>([])
   const [skinfolds, setSkinfolds] = useState<SkinfoldPoint[]>([])
 
   useEffect(() => {
+    async function loadClient() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { router.push('/login'); return }
+      let id: string | null = null
+      const { data: byUserId } = await supabase.from('clients').select('id').eq('user_id', user.id).maybeSingle()
+      if (byUserId) {
+        id = byUserId.id
+      } else if (user.email) {
+        const { data: byEmail } = await supabase.from('clients').select('id').eq('email', user.email).maybeSingle()
+        if (byEmail) id = byEmail.id
+      }
+      if (!id) { router.push('/login'); return }
+      setClientId(id)
+    }
+    loadClient()
+  }, [])
+
+  useEffect(() => {
+    if (!clientId) return
     async function fetchData() {
       const [{ data: logs }, { data: skins }] = await Promise.all([
         supabase.from('daily_logs').select('log_date, weight_kg, steps').eq('client_id', clientId)
@@ -206,10 +227,13 @@ export default function MetingenClient({ clientId }: { clientId: string }) {
   }, [clientId])
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      <WeightSection logs={dailyLogs} />
-      <StepsSection logs={dailyLogs} />
-      <BFSection skinfolds={skinfolds} />
+    <div>
+      <h1 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: '24px' }}>Metingen</h1>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <WeightSection logs={dailyLogs} />
+        <StepsSection logs={dailyLogs} />
+        <BFSection skinfolds={skinfolds} />
+      </div>
     </div>
   )
 }
