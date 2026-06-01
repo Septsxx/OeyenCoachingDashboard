@@ -59,7 +59,7 @@ export default function ActiesCard({ clientId }: { clientId: string }) {
   useEffect(() => {
     async function fetchStatus() {
       const [{ data: log }, { data: checkin }] = await Promise.all([
-        supabase.from('daily_logs').select('id').eq('client_id', clientId).eq('log_date', todayStr).maybeSingle(),
+        supabase.from('daily_logs').select('id').eq('client_id', clientId).eq('log_date', todayStr).eq('filled_by', 'client').maybeSingle(),
         supabase.from('weekly_checkins').select('id').eq('client_id', clientId).eq('week_number', currentWeek).maybeSingle(),
       ])
       setLogDone(!!log)

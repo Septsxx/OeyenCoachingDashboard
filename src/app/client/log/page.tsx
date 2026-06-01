@@ -58,6 +58,7 @@ export default function DailyLogPage() {
   const [selectedDate, setSelectedDate] = useState(todayStr)
   const [loading, setLoading] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
   const [existingId, setExistingId] = useState<string | null>(null)
   const [form, setForm] = useState({ ...emptyForm })
   const [recentLogs, setRecentLogs] = useState<DailyLog[]>([])
@@ -128,9 +129,25 @@ export default function DailyLogPage() {
     loadLog()
   }, [clientId, selectedDate])
 
+  function isFormEmpty(): boolean {
+    return (
+      !form.weight_kg && !form.water_liters && !form.rhr &&
+      !form.nutrition_adherence && !form.hunger_score && !form.off_plan_meals && !form.stool_count &&
+      !form.steps && !form.cardio_minutes && !form.resistance_training &&
+      !form.strength_score && !form.motivation_score && !form.training_notes &&
+      !form.sleep_time && !form.wake_time && !form.sleep_quality && !form.sleep_notes &&
+      !form.energy_levels && !form.stress_levels
+    )
+  }
+
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     if (!clientId) return
+    if (isFormEmpty()) {
+      setFormError('Vul minstens één veld in voor je de log opslaat.')
+      return
+    }
+    setFormError(null)
     setLoading(true)
     const sleepMinutes = calcSleepMinutes(form.sleep_time, form.wake_time)
     const payload = {
@@ -352,6 +369,7 @@ export default function DailyLogPage() {
           </div>
         </Section>
 
+        {formError && <p style={{ color: '#EF4444', fontSize: '0.82rem', marginBottom: '12px', textAlign: 'center' }}>{formError}</p>}
         <button type="submit" disabled={loading || saved} style={{ ...BTN_PRIMARY, width: '100%', padding: '14px', fontSize: '0.9rem', opacity: (loading || saved) ? 0.7 : 1 }}>
           {saved ? 'Opgeslagen ✓' : loading ? 'Opslaan...' : existingId ? 'Log bijwerken' : 'Log opslaan'}
         </button>
