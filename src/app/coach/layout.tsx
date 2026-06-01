@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react'
 const NAV = [
   { href: '/coach', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/coach/clients', label: 'Klanten', icon: Users },
-  { href: '/coach/payments', label: 'Betalingen', icon: CreditCard },
+  { href: '/coach/payments', label: 'Financiën', icon: CreditCard },
   { href: '/coach/checkins', label: 'Check-ins', icon: ClipboardList },
   { href: '/coach/agenda', label: 'Agenda', icon: Calendar },
   { href: '/coach/voeding', label: 'Voeding', icon: Salad },
