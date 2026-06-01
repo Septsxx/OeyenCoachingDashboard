@@ -19,9 +19,12 @@ function LoginForm() {
     e.preventDefault()
     setLoading(true)
     setError('')
+    console.log('[login] handler called, email:', email)
 
     try {
+      console.log('[login] calling signInWithPassword...')
       const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+      console.log('[login] result:', { data, error })
       if (error) { setError(error.message); setLoading(false); return }
 
       const { data: profile } = await supabase
