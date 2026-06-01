@@ -56,7 +56,7 @@ export default async function CoachDashboard() {
     const p = latestPayment.get(c.id)
     if (!p) return false
     const days = differenceInDays(parseISO(p.expiry_date), new Date())
-    return days >= 0 && days <= 14
+    return days >= 0 && days <= 7
   })
   const expired = activeClients.filter(c => {
     const p = latestPayment.get(c.id)
