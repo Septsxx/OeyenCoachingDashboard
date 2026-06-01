@@ -42,6 +42,7 @@ body {
   font-family: system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   line-height: 1.5;
+  scrollbar-gutter: stable;
 }
 
 ::-webkit-scrollbar { width: 6px; height: 6px; }
