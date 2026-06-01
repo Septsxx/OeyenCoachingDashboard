@@ -1,5 +1,7 @@
 'use client'
+import { useState, useEffect, useRef } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+import { createClient } from '@/lib/supabase/client'
 
 type DailyLogPoint = { log_date: string; weight_kg: number | null; steps: number | null }
 type SkinfoldPoint = { measured_at: string; bf_pct: number | null }
@@ -182,15 +184,27 @@ function BFSection({ skinfolds }: { skinfolds: SkinfoldPoint[] }) {
   )
 }
 
-export default function MetingenClient({
-  dailyLogs,
-  skinfolds,
-}: {
-  clientId: string
-  initialMeasurements: never[]
-  dailyLogs: DailyLogPoint[]
-  skinfolds: SkinfoldPoint[]
-}) {
+export default function MetingenClient({ clientId }: { clientId: string }) {
+  const supabaseRef = useRef(createClient())
+  const supabase = supabaseRef.current
+
+  const [dailyLogs, setDailyLogs] = useState<DailyLogPoint[]>([])
+  const [skinfolds, setSkinfolds] = useState<SkinfoldPoint[]>([])
+
+  useEffect(() => {
+    async function fetchData() {
+      const [{ data: logs }, { data: skins }] = await Promise.all([
+        supabase.from('daily_logs').select('log_date, weight_kg, steps').eq('client_id', clientId)
+          .order('log_date', { ascending: true }).limit(180),
+        supabase.from('skinfold_measurements').select('measured_at, bf_pct').eq('client_id', clientId)
+          .order('measured_at', { ascending: true }).limit(52),
+      ])
+      setDailyLogs(logs ?? [])
+      setSkinfolds(skins ?? [])
+    }
+    fetchData()
+  }, [clientId])
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <WeightSection logs={dailyLogs} />
@@ -199,4 +213,3 @@ export default function MetingenClient({
     </div>
   )
 }
-
