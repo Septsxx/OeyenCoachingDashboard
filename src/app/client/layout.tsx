@@ -122,10 +122,17 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
               fontSize: '0.65rem',
               fontWeight: active ? 600 : 400,
               letterSpacing: '0.5px',
-              borderTop: active ? '2px solid #004aad' : '2px solid transparent',
               transition: 'color 0.15s',
+              paddingTop: '6px',
             }}>
-              <span style={{ fontSize: '1.1rem', lineHeight: 1 }}>{icon}</span>
+              <span style={{
+                fontSize: '1.1rem',
+                lineHeight: 1,
+                background: active ? 'rgba(0, 74, 173, 0.12)' : 'transparent',
+                borderRadius: '8px',
+                padding: '4px 10px',
+                transition: 'background 0.15s',
+              }}>{icon}</span>
               {label}
             </Link>
           )

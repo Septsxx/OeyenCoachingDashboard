@@ -10,6 +10,20 @@ export default function RecentLogs({ logs }: { logs: DailyLog[] }) {
   const visible = expanded ? logs : logs.slice(0, INITIAL)
   const hasMore = logs.length > INITIAL
 
+  if (logs.length === 0) {
+    return (
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden', marginBottom: '24px' }}>
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
+          <p style={{ fontSize: '0.85rem', fontWeight: 600 }}>Recente logs</p>
+        </div>
+        <div style={{ padding: '32px 20px', textAlign: 'center' }}>
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-faint)', marginBottom: '12px' }}>Nog geen logs bijgehouden.</p>
+          <a href="/client/log" style={{ fontSize: '0.82rem', color: '#004aad', textDecoration: 'none', fontWeight: 600 }}>Begin met je eerste daglog →</a>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden', marginBottom: '24px' }}>
       <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>

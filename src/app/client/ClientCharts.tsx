@@ -1,4 +1,5 @@
 'use client'
+import { memo, useMemo } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import type { DailyLog } from '@/lib/types'
 
@@ -8,14 +9,14 @@ const TOOLTIP_STYLE = {
   itemStyle: { color: 'var(--text)' },
 }
 
-function MiniChart({ data, dataKey, label, color, unit }: {
+const MiniChart = memo(function MiniChart({ data, dataKey, label, color, unit }: {
   data: any[]
   dataKey: string
   label: string
   color: string
   unit: string
 }) {
-  const filtered = data.filter(d => d[dataKey] != null)
+  const filtered = useMemo(() => data.filter(d => d[dataKey] != null), [data, dataKey])
   if (filtered.length < 2) return null
   const values = filtered.map(d => d[dataKey] as number)
   const min = Math.min(...values)
@@ -59,9 +60,9 @@ function MiniChart({ data, dataKey, label, color, unit }: {
       </ResponsiveContainer>
     </div>
   )
-}
+})
 
-export default function ClientCharts({ logs }: { logs: DailyLog[] }) {
+export default memo(function ClientCharts({ logs }: { logs: DailyLog[] }) {
   const hasWeight = logs.some(l => l.weight_kg != null)
   const hasSteps = logs.some(l => l.steps != null)
   const hasEnergy = logs.some(l => l.energy_levels != null)
@@ -80,4 +81,4 @@ export default function ClientCharts({ logs }: { logs: DailyLog[] }) {
       {hasSleep && <MiniChart data={logs} dataKey="sleep_quality" label="Slaap" color="#8B5CF6" unit="/5" />}
     </div>
   )
-}
+})
