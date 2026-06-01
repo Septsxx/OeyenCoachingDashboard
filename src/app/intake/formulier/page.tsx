@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { ProgressBar } from '@/components/base/progress-indicators/progress-indicators'
 
 const S = {
   page: { minHeight: '100vh', background: '#F5F5F3', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', padding: '48px 16px' },
@@ -33,6 +34,9 @@ export default function IntakePage() {
   function set(key: string, value: string | boolean) {
     setForm(f => ({ ...f, [key]: value }))
   }
+
+  const TRACKED_FIELDS = ['full_name', 'email', 'phone', 'dob', 'gender', 'height_cm', 'start_weight_kg', 'short_term_goal', 'long_term_goal', 'motivation', 'coaching_experience', 'medical_conditions', 'injuries', 'current_diet', 'meal_frequency', 'alcohol_frequency', 'sleep_hours', 'stress_level', 'activity_level', 'training_days_per_week', 'training_experience']
+  const filledCount = TRACKED_FIELDS.filter(k => String((form as Record<string, unknown>)[k] ?? '').trim() !== '').length
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -104,9 +108,12 @@ export default function IntakePage() {
         </div>
 
         <h1 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '8px', textAlign: 'center', color: '#111' }}>Intake formulier</h1>
-        <p style={{ color: '#888', fontSize: '0.85rem', marginBottom: '32px', textAlign: 'center', lineHeight: 1.6 }}>
+        <p style={{ color: '#888', fontSize: '0.85rem', marginBottom: '24px', textAlign: 'center', lineHeight: 1.6 }}>
           Vul dit formulier zo volledig mogelijk in. Alle info blijft strikt vertrouwelijk.
         </p>
+        <div style={{ position: 'sticky', top: 0, zIndex: 10, background: '#F5F5F3', padding: '12px 0', marginBottom: '20px' }}>
+          <ProgressBar min={0} max={TRACKED_FIELDS.length} value={filledCount} label="Voortgang" />
+        </div>
 
         <form onSubmit={handleSubmit}>
           {/* Honeypot: bots fill this, humans don't see it */}
@@ -145,7 +152,6 @@ export default function IntakePage() {
                   <option value="">Kies...</option>
                   <option value="man">Man</option>
                   <option value="vrouw">Vrouw</option>
-                  <option value="anders">Anders</option>
                 </select>
               </div>
               <div style={{ ...S.grid2, gridTemplateColumns: '1fr 1fr' }}>
