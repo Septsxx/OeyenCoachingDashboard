@@ -20,7 +20,7 @@ export default function ResetPasswordPage() {
 
     setLoading(false)
     if (error) {
-      setError(error.message)
+      setError('Er is iets misgegaan. Controleer het e-mailadres en probeer opnieuw.')
     } else {
       setSent(true)
     }
@@ -64,15 +64,33 @@ export default function ResetPasswordPage() {
           padding: '36px',
         }}>
           <h1 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '8px', color: '#FFF' }}>
-            Wachtwoord resetten
+            Wachtwoord vergeten?
           </h1>
           <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '28px' }}>
-            Voer je e-mailadres in en we sturen je een resetlink.
+            Voer je e-mailadres in. Als er een account mee verbonden is, sturen we je een resetlink.
           </p>
 
           {sent ? (
-            <div style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: '8px', padding: '14px', fontSize: '0.85rem', color: '#22C55E' }}>
-              E-mail verstuurd! Controleer je inbox en klik op de link om je wachtwoord te resetten.
+            <div>
+              <div style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: '8px', padding: '14px', fontSize: '0.85rem', color: '#22C55E', marginBottom: '16px' }}>
+                Als dit e-mailadres bij ons bekend is, ontvang je zo dadelijk een e-mail met een resetlink. Controleer ook je spammap.
+              </div>
+              <button
+                type="button"
+                onClick={() => { setSent(false); setEmail('') }}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  background: 'transparent',
+                  color: '#666',
+                  border: '1px solid #333',
+                  borderRadius: '8px',
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                }}
+              >
+                Opnieuw proberen
+              </button>
             </div>
           ) : (
             <form onSubmit={handleReset}>
@@ -86,6 +104,7 @@ export default function ResetPasswordPage() {
                   onChange={e => setEmail(e.target.value)}
                   placeholder="naam@email.com"
                   required
+                  autoComplete="email"
                 />
               </div>
 

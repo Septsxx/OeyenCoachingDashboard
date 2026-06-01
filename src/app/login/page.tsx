@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation'
 function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const params = useSearchParams()
   const urlError = params.get('error')
@@ -19,13 +20,14 @@ function LoginForm() {
     e.preventDefault()
     setLoading(true)
     setError('')
-    console.log('[login] handler called, email:', email)
 
     try {
-      console.log('[login] calling signInWithPassword...')
       const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-      console.log('[login] result:', { data, error })
-      if (error) { setError(error.message); setLoading(false); return }
+      if (error) {
+        setError('Onjuist e-mailadres of wachtwoord.')
+        setLoading(false)
+        return
+      }
 
       const { data: profile } = await supabase
         .from('profiles')
@@ -34,8 +36,8 @@ function LoginForm() {
         .single()
 
       window.location.href = profile?.role === 'coach' ? '/coach' : '/client'
-    } catch (err: any) {
-      setError(err?.message ?? 'Onbekende fout. Probeer opnieuw.')
+    } catch {
+      setError('Verbindingsfout. Controleer je internetverbinding en probeer opnieuw.')
       setLoading(false)
     }
   }
@@ -52,19 +54,49 @@ function LoginForm() {
           onChange={e => setEmail(e.target.value)}
           placeholder="naam@email.com"
           required
+          autoComplete="email"
         />
       </div>
       <div style={{ marginBottom: '24px' }}>
-        <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#666', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '6px' }}>
-          Wachtwoord
-        </label>
-        <input
-          type="password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          placeholder="••••••••"
-          required
-        />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+          <label style={{ fontSize: '0.72rem', fontWeight: 600, color: '#666', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+            Wachtwoord
+          </label>
+          <a href="/reset-password" style={{ fontSize: '0.75rem', color: '#666', textDecoration: 'none' }}>
+            Vergeten?
+          </a>
+        </div>
+        <div style={{ position: 'relative' }}>
+          <input
+            type={showPassword ? 'text' : 'password'}
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            placeholder="••••••••"
+            required
+            autoComplete="current-password"
+            style={{ paddingRight: '44px' }}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(v => !v)}
+            style={{
+              position: 'absolute',
+              right: '12px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '0',
+              color: '#666',
+              fontSize: '0.8rem',
+              lineHeight: 1,
+            }}
+            aria-label={showPassword ? 'Verberg wachtwoord' : 'Toon wachtwoord'}
+          >
+            {showPassword ? '🙈' : '👁'}
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -91,12 +123,6 @@ function LoginForm() {
       >
         {loading ? 'Inloggen...' : 'Inloggen'}
       </button>
-
-      <div style={{ textAlign: 'center', marginTop: '16px' }}>
-        <a href="/reset-password" style={{ fontSize: '0.82rem', color: '#666', textDecoration: 'none' }}>
-          Wachtwoord vergeten?
-        </a>
-      </div>
     </form>
   )
 }

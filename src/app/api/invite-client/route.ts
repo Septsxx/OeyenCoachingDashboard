@@ -1,7 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 
 export async function POST(req: NextRequest) {
+  // Verify caller is an authenticated coach
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return NextResponse.json({ error: 'Niet ingelogd' }, { status: 401 })
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (profile?.role !== 'coach') {
+    return NextResponse.json({ error: 'Geen toegang' }, { status: 403 })
+  }
+
   const { email, clientId } = await req.json()
   if (!email || !clientId) {
     return NextResponse.json({ error: 'email en clientId zijn verplicht' }, { status: 400 })
@@ -20,7 +39,6 @@ export async function POST(req: NextRequest) {
 
   const userId = data.user.id
 
-  // Link the user to the client row and create their profile
   await Promise.all([
     admin.from('clients').update({ user_id: userId }).eq('id', clientId),
     admin.from('profiles').upsert({ id: userId, email, role: 'client' }, { onConflict: 'id' }),
