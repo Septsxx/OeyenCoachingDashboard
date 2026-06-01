@@ -1,7 +1,6 @@
 'use client'
-export const dynamic = 'force-dynamic'
 import { useRouter, usePathname } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
@@ -17,7 +16,8 @@ const NAV = [
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
-  const supabase = createClient()
+  const supabaseRef = useRef(createClient())
+  const supabase = supabaseRef.current
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
 
   useEffect(() => {

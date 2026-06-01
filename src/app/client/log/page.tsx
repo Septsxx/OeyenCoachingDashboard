@@ -62,6 +62,14 @@ export default function DailyLogPage() {
   const [existingId, setExistingId] = useState<string | null>(null)
   const [form, setForm] = useState({ ...emptyForm })
   const [recentLogs, setRecentLogs] = useState<DailyLog[]>([])
+
+  function hasData(l: DailyLog): boolean {
+    return !!(l.weight_kg || l.water_liters || l.rhr || l.nutrition_adherence ||
+      l.hunger_score || l.off_plan_meals || l.stool_count || l.steps ||
+      l.cardio_minutes || l.resistance_training != null || l.strength_score ||
+      l.motivation_score || l.training_notes || l.sleep_time || l.wake_time ||
+      l.sleep_quality || l.sleep_notes || l.energy_levels || l.stress_levels)
+  }
   const [showAllLogs, setShowAllLogs] = useState(false)
 
   function set(key: string, value: string) {
@@ -88,7 +96,7 @@ export default function DailyLogPage() {
       const { data: logs } = await supabase
         .from('daily_logs').select('*').eq('client_id', clientId)
         .order('log_date', { ascending: false }).limit(60)
-      setRecentLogs((logs as DailyLog[]) ?? [])
+      setRecentLogs(((logs as DailyLog[]) ?? []).filter(hasData))
     }
     loadClient()
   }, [])
@@ -224,7 +232,7 @@ export default function DailyLogPage() {
                 {(showAllLogs ? recentLogs : recentLogs.slice(0, 5)).map(l => (
                   <div key={l.id} style={{ padding: '12px 16px', borderBottom: '1px solid var(--surface-2)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                      <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text)' }}>{formatDate(l.log_date)}</span>
+                      <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text)' }}>{formatDate(l.log_date)} <span style={{ color: '#22C55E', fontWeight: 400 }}>✓</span></span>
                       {l.weight_kg && <span style={{ fontSize: '0.82rem', color: 'var(--text-dim)' }}>{l.weight_kg} kg</span>}
                     </div>
                     <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
@@ -268,7 +276,7 @@ export default function DailyLogPage() {
             Vandaag
           </button>
         )}
-        {existingId && <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', whiteSpace: 'nowrap' }}>Al ingevuld ✓</span>}
+        {existingId && !isFormEmpty() && <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', whiteSpace: 'nowrap' }}>Al ingevuld ✓</span>}
       </div>
 
       <form onSubmit={handleSave}>

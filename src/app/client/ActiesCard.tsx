@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
@@ -48,7 +48,8 @@ function TodoRow({ href, done, label, doneLabel, last }: {
 }
 
 export default function ActiesCard({ clientId }: { clientId: string }) {
-  const supabase = createClient()
+  const supabaseRef = useRef(createClient())
+  const supabase = supabaseRef.current
   const today = new Date()
   const todayStr = localDateStr(today)
   const currentWeek = isoWeek(today)
