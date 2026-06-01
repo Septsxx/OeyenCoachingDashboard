@@ -64,18 +64,20 @@ function WeightSection({ logs }: { logs: DailyLogPoint[] }) {
           )}
         </div>
       </div>
-      <ResponsiveContainer width="100%" height={120}>
-        <LineChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
-          <XAxis dataKey="date" hide />
-          <YAxis domain={[min * 0.985, max * 1.015]} hide />
-          <Tooltip
-            {...TOOLTIP_STYLE}
-            formatter={(v: any) => [`${v} kg`, 'Gewicht']}
-            labelFormatter={(label: any) => formatDateShort(String(label))}
-          />
-          <Line type="monotone" dataKey="weight" stroke="#004aad" strokeWidth={2} dot={false} activeDot={{ r: 3, fill: '#004aad' }} connectNulls />
-        </LineChart>
-      </ResponsiveContainer>
+      <div style={{ width: '100%', height: 120, overflow: 'hidden' }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
+            <XAxis dataKey="date" hide />
+            <YAxis domain={[min * 0.985, max * 1.015]} hide />
+            <Tooltip
+              {...TOOLTIP_STYLE}
+              formatter={(v: any) => [`${v} kg`, 'Gewicht']}
+              labelFormatter={(label: any) => formatDateShort(String(label))}
+            />
+            <Line type="monotone" dataKey="weight" stroke="#004aad" strokeWidth={2} dot={false} activeDot={{ r: 3, fill: '#004aad' }} connectNulls />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </SectionCard>
   )
 }
@@ -119,18 +121,20 @@ function StepsSection({ logs }: { logs: DailyLogPoint[] }) {
         </div>
       </div>
       {stepsLogs.length >= 2 && (
-        <ResponsiveContainer width="100%" height={80}>
-          <LineChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
-            <XAxis dataKey="date" hide />
-            <YAxis domain={[Math.max(0, min * 0.9), max * 1.1]} hide />
-            <Tooltip
-              {...TOOLTIP_STYLE}
-              formatter={(v: any) => [v.toLocaleString('nl-BE'), 'Stappen']}
-              labelFormatter={(label: any) => formatDateShort(String(label))}
-            />
-            <Line type="monotone" dataKey="steps" stroke="#22C55E" strokeWidth={2} dot={false} activeDot={{ r: 3, fill: '#22C55E' }} connectNulls />
-          </LineChart>
-        </ResponsiveContainer>
+        <div style={{ width: '100%', height: 80, overflow: 'hidden' }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
+              <XAxis dataKey="date" hide />
+              <YAxis domain={[Math.max(0, min * 0.9), max * 1.1]} hide />
+              <Tooltip
+                {...TOOLTIP_STYLE}
+                formatter={(v: any) => [v.toLocaleString('nl-BE'), 'Stappen']}
+                labelFormatter={(label: any) => formatDateShort(String(label))}
+              />
+              <Line type="monotone" dataKey="steps" stroke="#22C55E" strokeWidth={2} dot={false} activeDot={{ r: 3, fill: '#22C55E' }} connectNulls />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       )}
     </SectionCard>
   )
@@ -169,18 +173,20 @@ function BFSection({ skinfolds }: { skinfolds: SkinfoldPoint[] }) {
           )}
         </div>
       </div>
-      <ResponsiveContainer width="100%" height={120}>
-        <LineChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
-          <XAxis dataKey="date" hide />
-          <YAxis domain={[min * 0.95, max * 1.05]} hide />
-          <Tooltip
-            {...TOOLTIP_STYLE}
-            formatter={(v: any) => [`${v.toFixed(1)}%`, 'BF%']}
-            labelFormatter={(label: any) => formatDateShort(String(label))}
-          />
-          <Line type="monotone" dataKey="bf" stroke="#8B5CF6" strokeWidth={2} dot={{ r: 3, fill: '#8B5CF6' }} activeDot={{ r: 4 }} connectNulls />
-        </LineChart>
-      </ResponsiveContainer>
+      <div style={{ width: '100%', height: 120, overflow: 'hidden' }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
+            <XAxis dataKey="date" hide />
+            <YAxis domain={[min * 0.95, max * 1.05]} hide />
+            <Tooltip
+              {...TOOLTIP_STYLE}
+              formatter={(v: any) => [`${v.toFixed(1)}%`, 'BF%']}
+              labelFormatter={(label: any) => formatDateShort(String(label))}
+            />
+            <Line type="monotone" dataKey="bf" stroke="#8B5CF6" strokeWidth={2} dot={{ r: 3, fill: '#8B5CF6' }} activeDot={{ r: 4 }} connectNulls />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </SectionCard>
   )
 }
