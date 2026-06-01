@@ -91,6 +91,12 @@ function LoginForm() {
       >
         {loading ? 'Inloggen...' : 'Inloggen'}
       </button>
+
+      <div style={{ textAlign: 'center', marginTop: '16px' }}>
+        <a href="/reset-password" style={{ fontSize: '0.82rem', color: '#666', textDecoration: 'none' }}>
+          Wachtwoord vergeten?
+        </a>
+      </div>
     </form>
   )
 }
