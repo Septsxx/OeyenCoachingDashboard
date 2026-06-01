@@ -67,6 +67,23 @@ export default function FinancienTabs({
 
       {tab === 'overzicht' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          {/* Status summary */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+            {[
+              { label: 'Actief (>7 dagen)', value: stats.ok, color: '#22C55E', bg: 'rgba(34,197,94,0.08)' },
+              { label: 'Verloopt binnenkort', value: stats.soon, color: '#F97316', bg: 'rgba(249,115,22,0.08)' },
+              { label: 'Vervallen', value: stats.expired, color: '#EF4444', bg: 'rgba(239,68,68,0.08)' },
+            ].map(({ label, value, color, bg }) => (
+              <div key={label} style={{ background: bg, border: `1px solid ${color}33`, borderRadius: '12px', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: color, flexShrink: 0 }} />
+                <div>
+                  <p style={{ fontSize: '0.72rem', color, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '2px' }}>{label}</p>
+                  <p style={{ fontSize: '1.5rem', fontWeight: 700, color, lineHeight: 1 }}>{value}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
           {/* KPI cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
             {[
@@ -177,22 +194,6 @@ export default function FinancienTabs({
             </div>
           )}
 
-          {/* Status summary */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
-            {[
-              { label: 'Actief (>14 dagen)', value: stats.ok, color: '#22C55E', bg: 'rgba(34,197,94,0.08)' },
-              { label: 'Verloopt binnenkort', value: stats.soon, color: '#F97316', bg: 'rgba(249,115,22,0.08)' },
-              { label: 'Vervallen', value: stats.expired, color: '#EF4444', bg: 'rgba(239,68,68,0.08)' },
-            ].map(({ label, value, color, bg }) => (
-              <div key={label} style={{ background: bg, border: `1px solid ${color}33`, borderRadius: '12px', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: color, flexShrink: 0 }} />
-                <div>
-                  <p style={{ fontSize: '0.72rem', color, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '2px' }}>{label}</p>
-                  <p style={{ fontSize: '1.5rem', fontWeight: 700, color, lineHeight: 1 }}>{value}</p>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       )}
 

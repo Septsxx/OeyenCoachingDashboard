@@ -25,8 +25,8 @@ export default async function PaymentsPage() {
 
   // Status stats
   const stats = {
-    ok: all.filter(p => { const s = getPaymentStatus(p); return s.days !== null && s.days > 14 }).length,
-    soon: all.filter(p => { const s = getPaymentStatus(p); return s.days !== null && s.days >= 0 && s.days <= 14 }).length,
+    ok: all.filter(p => { const s = getPaymentStatus(p); return s.days !== null && s.days > 7 }).length,
+    soon: all.filter(p => { const s = getPaymentStatus(p); return s.days !== null && s.days >= 0 && s.days <= 7 }).length,
     expired: all.filter(p => { const s = getPaymentStatus(p); return s.days !== null && s.days < 0 }).length,
     total: all.reduce((sum, p) => sum + p.amount, 0),
   }
