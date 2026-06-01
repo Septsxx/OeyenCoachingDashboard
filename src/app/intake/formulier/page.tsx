@@ -3,14 +3,14 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 const S = {
-  page: { minHeight: '100vh', background: '#0A0A0A', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', padding: '48px 16px' },
+  page: { minHeight: '100vh', background: '#F5F5F3', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', padding: '48px 16px' },
   card: { width: '100%', maxWidth: '640px' },
   logo: { marginBottom: '40px', textAlign: 'center' as const },
-  section: { background: '#111', border: '1px solid #222', borderRadius: '12px', padding: '24px', marginBottom: '20px' },
-  sectionTitle: { fontSize: '0.7rem', fontWeight: 600, color: '#444', textTransform: 'uppercase' as const, letterSpacing: '1.5px', marginBottom: '16px' },
+  section: { background: '#FFFFFF', border: '1px solid #E5E5E3', borderRadius: '12px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' },
+  sectionTitle: { fontSize: '0.7rem', fontWeight: 700, color: '#999', textTransform: 'uppercase' as const, letterSpacing: '1.5px', marginBottom: '16px' },
   grid2: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' },
   field: { marginBottom: '16px' },
-  label: { display: 'block', fontSize: '0.72rem', fontWeight: 500, color: '#666', textTransform: 'uppercase' as const, letterSpacing: '0.8px', marginBottom: '6px' },
+  label: { display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#555', textTransform: 'uppercase' as const, letterSpacing: '0.6px', marginBottom: '6px' },
 }
 
 export default function IntakePage() {
@@ -83,11 +83,11 @@ export default function IntakePage() {
 
   if (step === 'done') {
     return (
-      <div style={S.page}>
+      <div style={S.page} data-theme="light">
         <div style={{ ...S.card, textAlign: 'center', paddingTop: '80px' }}>
           <div style={{ fontSize: '2rem', marginBottom: '16px' }}>✓</div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '12px' }}>Intake ontvangen!</h1>
-          <p style={{ color: '#666', fontSize: '0.9rem', lineHeight: 1.6 }}>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '12px', color: '#111' }}>Intake ontvangen!</h1>
+          <p style={{ color: '#777', fontSize: '0.9rem', lineHeight: 1.6 }}>
             Bedankt voor het invullen van de intake. Je ontvangt zo meteen een e-mail met een link om je account in te stellen en in te loggen op het clientportaal.
           </p>
         </div>
@@ -96,15 +96,15 @@ export default function IntakePage() {
   }
 
   return (
-    <div style={S.page}>
+    <div style={S.page} data-theme="light">
       <div style={S.card}>
         <div style={S.logo}>
-          <div style={{ fontSize: '1.1rem', fontWeight: 800, letterSpacing: '3px', color: '#FFF' }}>OEYEN</div>
-          <div style={{ fontSize: '0.55rem', letterSpacing: '5px', color: '#444', marginTop: '2px' }}>COACHING</div>
+          <div style={{ fontSize: '1.1rem', fontWeight: 800, letterSpacing: '3px', color: '#111' }}>OEYEN</div>
+          <div style={{ fontSize: '0.55rem', letterSpacing: '5px', color: '#999', marginTop: '2px' }}>COACHING</div>
         </div>
 
-        <h1 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '8px', textAlign: 'center' }}>Intake formulier</h1>
-        <p style={{ color: '#666', fontSize: '0.85rem', marginBottom: '32px', textAlign: 'center', lineHeight: 1.6 }}>
+        <h1 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '8px', textAlign: 'center', color: '#111' }}>Intake formulier</h1>
+        <p style={{ color: '#888', fontSize: '0.85rem', marginBottom: '32px', textAlign: 'center', lineHeight: 1.6 }}>
           Vul dit formulier zo volledig mogelijk in. Alle info blijft strikt vertrouwelijk.
         </p>
 
@@ -279,7 +279,7 @@ export default function IntakePage() {
           )}
 
           <button type="submit" disabled={loading} style={{
-            width: '100%', padding: '14px', borderRadius: '10px', background: '#FFF', color: '#000',
+            width: '100%', padding: '14px', borderRadius: '10px', background: '#111', color: '#FFF',
             border: 'none', fontSize: '0.9rem', fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer',
             opacity: loading ? 0.7 : 1, marginBottom: '32px',
           }}>
