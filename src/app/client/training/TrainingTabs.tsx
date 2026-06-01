@@ -1,10 +1,8 @@
 'use client'
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import type { TrainingSchema, TrainingExercise } from '@/lib/types'
 
 type Schema = TrainingSchema & { exercises: TrainingExercise[] }
-type LogEntry = { exercise_id: string; week_number: number; set_number: number; value: string }
 
 const stickyTh = {
   position: 'sticky' as const,
@@ -46,56 +44,17 @@ const setTh = {
   borderRight: '1px solid var(--surface-2)',
 }
 
-function logKey(exerciseId: string, week: number, set: number) {
-  return `${exerciseId}-${week}-${set}`
-}
-
 export default function TrainingTabs({
   schemas,
-  clientId,
-  initialLogs,
 }: {
   schemas: Schema[]
   clientId: string
-  initialLogs: LogEntry[]
+  initialLogs: unknown[]
 }) {
-  const supabase = createClient()
   const [activeId, setActiveId] = useState(schemas[0]?.id ?? '')
-  const [logs, setLogs] = useState<Record<string, string>>(() => {
-    const map: Record<string, string> = {}
-    for (const l of initialLogs) {
-      map[logKey(l.exercise_id, l.week_number, l.set_number)] = l.value
-    }
-    return map
-  })
-  const [savingKey, setSavingKey] = useState<string | null>(null)
 
   const schema = schemas.find(s => s.id === activeId) ?? schemas[0]
   const weeks = Array.from({ length: schema.weeks_count }, (_, i) => i + 1)
-
-  async function handleBlur(exerciseId: string, week: number, set: number) {
-    const key = logKey(exerciseId, week, set)
-    const value = logs[key] ?? ''
-    setSavingKey(key)
-    if (value.trim() === '') {
-      await supabase.from('training_logs')
-        .delete()
-        .eq('exercise_id', exerciseId)
-        .eq('client_id', clientId)
-        .eq('week_number', week)
-        .eq('set_number', set)
-    } else {
-      await supabase.from('training_logs').upsert({
-        exercise_id: exerciseId,
-        client_id: clientId,
-        week_number: week,
-        set_number: set,
-        value,
-        updated_at: new Date().toISOString(),
-      }, { onConflict: 'exercise_id,client_id,week_number,set_number' })
-    }
-    setSavingKey(null)
-  }
 
   const tabStyle = (active: boolean): React.CSSProperties => ({
     padding: '8px 16px',
@@ -160,39 +119,20 @@ export default function TrainingTabs({
                     {weeks.map(w => (
                       <tr key={w}>
                         <td style={stickyTd}>{w}</td>
-                        {Array.from({ length: ex.sets_count }, (_, i) => {
-                          const key = logKey(ex.id, w, i + 1)
-                          const isSaving = savingKey === key
-                          return (
-                            <td key={i} style={{
-                              borderBottom: '1px solid var(--surface-2)',
-                              borderRight: '1px solid var(--surface-2)',
-                              minWidth: '72px',
-                              height: '40px',
-                              padding: 0,
-                              background: isSaving ? 'var(--surface-2)' : undefined,
-                            }}>
-                              <input
-                                value={logs[key] ?? ''}
-                                onChange={e => setLogs(l => ({ ...l, [key]: e.target.value }))}
-                                onBlur={() => handleBlur(ex.id, w, i + 1)}
-                                placeholder="—"
-                                style={{
-                                  width: '100%',
-                                  height: '40px',
-                                  border: 'none',
-                                  background: 'transparent',
-                                  textAlign: 'center',
-                                  fontSize: '0.78rem',
-                                  color: 'var(--text)',
-                                  padding: '0 6px',
-                                  outline: 'none',
-                                  cursor: 'text',
-                                }}
-                              />
-                            </td>
-                          )
-                        })}
+                        {Array.from({ length: ex.sets_count }, (_, i) => (
+                          <td key={i} style={{
+                            borderBottom: '1px solid var(--surface-2)',
+                            borderRight: '1px solid var(--surface-2)',
+                            minWidth: '72px',
+                            height: '40px',
+                            textAlign: 'center',
+                            fontSize: '0.78rem',
+                            color: 'var(--text-faint)',
+                            padding: '0 6px',
+                          }}>
+                            —
+                          </td>
+                        ))}
                       </tr>
                     ))}
                   </tbody>
@@ -202,9 +142,6 @@ export default function TrainingTabs({
           ))}
         </div>
       )}
-      <p style={{ fontSize: '0.72rem', color: 'var(--text-faint)', marginTop: '16px', textAlign: 'center' }}>
-        Waarden worden automatisch opgeslagen bij het verlaten van een cel.
-      </p>
     </div>
   )
 }
