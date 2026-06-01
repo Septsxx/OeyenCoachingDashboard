@@ -21,25 +21,55 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
+  // Refresh session — verplicht voor SSR auth
   const { data: { user } } = await supabase.auth.getUser()
 
-  const path = request.nextUrl.pathname
+  const { pathname } = request.nextUrl
+  const isCoachRoute = pathname.startsWith('/coach')
+  const isClientRoute = pathname.startsWith('/client')
+  const isProtectedRoute = isCoachRoute || isClientRoute
 
-  const publicRoutes = ['/', '/login', '/intake', '/auth', '/reset-password', '/update-password']
-  const isPublic = publicRoutes.some(r => path === r || path.startsWith('/intake') || path.startsWith('/auth') || path.startsWith('/reset-password') || path.startsWith('/update-password'))
-
-  if (!user && !isPublic) {
-    return NextResponse.redirect(new URL('/login', request.url))
+  // Niet ingelogd → doorsturen naar login
+  if (!user && isProtectedRoute) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
   }
 
-  if (user && path === '/login') {
+  // Rolgebaseerde toegangscontrole
+  if (user && isProtectedRoute) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single()
-    const destination = profile?.role === 'coach' ? '/coach' : '/client'
-    return NextResponse.redirect(new URL(destination, request.url))
+
+    const role = profile?.role
+
+    if (isCoachRoute && role !== 'coach') {
+      const url = request.nextUrl.clone()
+      url.pathname = role === 'client' ? '/client' : '/login'
+      return NextResponse.redirect(url)
+    }
+
+    if (isClientRoute && role !== 'client') {
+      const url = request.nextUrl.clone()
+      url.pathname = role === 'coach' ? '/coach' : '/login'
+      return NextResponse.redirect(url)
+    }
+  }
+
+  // Ingelogd op /login → doorsturen naar dashboard
+  if (user && pathname === '/login') {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    const url = request.nextUrl.clone()
+    url.pathname = profile?.role === 'coach' ? '/coach' : '/client'
+    return NextResponse.redirect(url)
   }
 
   return supabaseResponse
