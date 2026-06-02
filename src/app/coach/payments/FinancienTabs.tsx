@@ -119,7 +119,7 @@ export default function FinancienTabs({
                   />
                   <Tooltip
                     {...CHART_TOOLTIP}
-                    formatter={(v: number) => [`€${v.toLocaleString('nl-BE')}`, 'Omzet']}
+                    formatter={(v) => [`€${Number(v).toLocaleString('nl-BE')}`, 'Omzet']}
                   />
                   <Bar dataKey="revenue" fill="#004aad" radius={[4, 4, 0, 0]} />
                 </BarChart>
@@ -138,7 +138,7 @@ export default function FinancienTabs({
                   <YAxis type="category" dataKey="label" tick={{ fontSize: 11, fill: 'var(--text-faint)' }} axisLine={false} tickLine={false} width={90} />
                   <Tooltip
                     {...CHART_TOOLTIP}
-                    formatter={(v: number) => [`€${v.toLocaleString('nl-BE')}`, 'Omzet']}
+                    formatter={(v) => [`€${Number(v).toLocaleString('nl-BE')}`, 'Omzet']}
                   />
                   <Bar dataKey="revenue" radius={[0, 4, 4, 0]}>
                     {packageData.map((_, i) => (
