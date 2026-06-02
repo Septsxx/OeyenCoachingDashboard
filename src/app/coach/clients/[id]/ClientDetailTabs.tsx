@@ -44,12 +44,14 @@ export default function ClientDetailTabs({
   const [showProfileEdit, setShowProfileEdit] = useState(false)
   const [checkinToAnswer, setCheckinToAnswer] = useState<WeeklyCheckin | null>(null)
   const [stepGoal, setStepGoal] = useState<number | null>(client.step_goal)
+  const [prevStepGoal, setPrevStepGoal] = useState<number | null>(null)
   const [editingStepGoal, setEditingStepGoal] = useState(false)
   const [stepGoalInput, setStepGoalInput] = useState(client.step_goal != null ? String(client.step_goal) : '')
 
   async function saveStepGoal(raw: string) {
     const num = raw === '' ? null : parseInt(raw, 10)
     if (raw !== '' && isNaN(num as number)) return
+    if (num !== stepGoal) setPrevStepGoal(stepGoal)
     setStepGoal(num)
     setEditingStepGoal(false)
     await fetch('/api/coach/clients/step-goal', {
@@ -152,6 +154,11 @@ export default function ClientDetailTabs({
                   <p style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--text)' }}>
                     {stepGoal != null ? stepGoal.toLocaleString('nl-BE') : <span style={{ color: 'var(--text-faint)', fontSize: '1rem' }}>Instellen</span>}
                   </p>
+                  {prevStepGoal != null && (
+                    <p style={{ fontSize: '0.7rem', color: 'var(--text-faint)', marginTop: '4px' }}>
+                      Vorig doel: {prevStepGoal.toLocaleString('nl-BE')}
+                    </p>
+                  )}
                 </button>
               )}
             </div>
