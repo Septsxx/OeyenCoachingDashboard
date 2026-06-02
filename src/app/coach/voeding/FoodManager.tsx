@@ -15,6 +15,7 @@ const EMPTY_FORM = {
 
 type FormState = typeof EMPTY_FORM
 
+
 function MacroBadge({ label, value, color }: { label: string; value: number; color: string }) {
   return (
     <span style={{ fontSize: '0.72rem', color, fontWeight: 600 }}>
