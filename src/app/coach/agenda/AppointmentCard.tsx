@@ -24,7 +24,7 @@ export default function AppointmentCard({
   dim,
 }: {
   appointment: AppointmentWithClient
-  clients: Pick<Client, 'id' | 'full_name'>[]
+  clients: Pick<Client, 'id' | 'full_name' | 'email'>[]
   dim: boolean
 }) {
   const router = useRouter()
@@ -60,6 +60,26 @@ export default function AppointmentCard({
       location: form.location || null,
       notes: form.notes || null,
     }).eq('id', a.id)
+
+    if (a.google_event_id) {
+      const client = clients.find(c => c.id === form.client_id)
+      fetch('/api/google/update-event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventId: a.google_event_id,
+          title: form.title,
+          date: form.appointment_date,
+          time: form.appointment_time || undefined,
+          durationMinutes: form.duration_minutes ? Number(form.duration_minutes) : 60,
+          location: form.location || undefined,
+          notes: form.notes || undefined,
+          clientEmail: client?.email,
+          clientName: client?.full_name,
+        }),
+      })
+    }
+
     setLoading(false)
     setEditing(false)
     router.refresh()
@@ -68,6 +88,15 @@ export default function AppointmentCard({
   async function handleDelete() {
     setDeleting(true)
     await supabase.from('appointments').delete().eq('id', a.id)
+
+    if (a.google_event_id) {
+      fetch('/api/google/delete-event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ eventId: a.google_event_id }),
+      })
+    }
+
     router.refresh()
   }
 

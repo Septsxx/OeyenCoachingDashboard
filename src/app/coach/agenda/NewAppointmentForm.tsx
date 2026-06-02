@@ -46,7 +46,7 @@ export default function NewAppointmentForm({ clients }: { clients: Pick<Client, 
     e.preventDefault()
     setLoading(true)
 
-    const { error } = await supabase.from('appointments').insert({
+    const { data: inserted, error } = await supabase.from('appointments').insert({
       client_id: form.client_id || null,
       title: form.title,
       appointment_date: form.appointment_date,
@@ -55,7 +55,7 @@ export default function NewAppointmentForm({ clients }: { clients: Pick<Client, 
       type: form.type,
       location: form.location || null,
       notes: form.notes || null,
-    })
+    }).select('id').single()
 
     if (error) {
       setLoading(false)
@@ -80,7 +80,15 @@ export default function NewAppointmentForm({ clients }: { clients: Pick<Client, 
           clientName: client?.full_name,
         }),
       })
-      setCalStatus(res.ok ? 'ok' : 'warn')
+      if (res.ok) {
+        const { eventId } = await res.json()
+        if (eventId && inserted?.id) {
+          await supabase.from('appointments').update({ google_event_id: eventId }).eq('id', inserted.id)
+        }
+        setCalStatus('ok')
+      } else {
+        setCalStatus('warn')
+      }
     } catch {
       setCalStatus('warn')
     }

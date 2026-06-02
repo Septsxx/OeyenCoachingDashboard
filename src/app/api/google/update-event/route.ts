@@ -9,6 +9,7 @@ export async function POST(req: NextRequest) {
   }
 
   const {
+    eventId,
     title,
     date,
     time,
@@ -18,6 +19,7 @@ export async function POST(req: NextRequest) {
     clientEmail,
     clientName,
   }: {
+    eventId: string
     title: string
     date: string
     time?: string
@@ -50,8 +52,7 @@ export async function POST(req: NextRequest) {
     startObj = { dateTime: startDT, timeZone: TIMEZONE }
     endObj = { dateTime: endDT, timeZone: TIMEZONE }
   } else {
-    // Dagafspraak zonder tijdstip
-    const nextDay = new Date(date)
+    const nextDay = new Date(`${date}T00:00:00`)
     nextDay.setDate(nextDay.getDate() + 1)
     startObj = { date }
     endObj = { date: nextDay.toISOString().slice(0, 10) }
@@ -62,8 +63,9 @@ export async function POST(req: NextRequest) {
     : []
 
   try {
-    const { data } = await calendar.events.insert({
+    await calendar.events.patch({
       calendarId: 'primary',
+      eventId,
       sendUpdates: 'all',
       requestBody: {
         summary: title,
@@ -74,9 +76,9 @@ export async function POST(req: NextRequest) {
         attendees,
       },
     })
-    return NextResponse.json({ ok: true, eventId: data.id, htmlLink: data.htmlLink })
+    return NextResponse.json({ ok: true })
   } catch (err: any) {
-    console.error('Google Calendar fout:', err?.message)
+    console.error('Google Calendar update fout:', err?.message)
     return NextResponse.json({ error: err?.message ?? 'Onbekende fout' }, { status: 500 })
   }
 }

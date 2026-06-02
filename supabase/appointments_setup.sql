@@ -14,8 +14,12 @@ CREATE TABLE IF NOT EXISTS appointments (
   type TEXT NOT NULL DEFAULT 'coaching',
   location TEXT,
   notes TEXT,
+  google_event_id TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Migratie voor bestaande tabellen
+ALTER TABLE appointments ADD COLUMN IF NOT EXISTS google_event_id TEXT;
 
 ALTER TABLE appointments ENABLE ROW LEVEL SECURITY;
 
