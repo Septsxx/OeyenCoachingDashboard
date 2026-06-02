@@ -1,10 +1,10 @@
 'use client'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip,
   ResponsiveContainer, CartesianGrid
 } from 'recharts'
-import type { Client, Payment, DailyLog, SkinfoldMeasurement, WeeklyCheckin, MealPlan, TrainingSchema, TrainingExercise } from '@/lib/types'
+import type { Client, Payment, DailyLog, SkinfoldMeasurement, WeeklyCheckin, MealPlan, TrainingSchema, TrainingExercise, WeeklyTimeline } from '@/lib/types'
 import { PACKAGES } from '@/lib/types'
 import { getPaymentStatus } from '@/lib/payment-utils'
 import { CHART_TOOLTIP, formatDate, formatDateShort } from '@/lib/ui'
@@ -15,8 +15,61 @@ import MealPlanEditor from './MealPlanEditor'
 import WorkoutPlanEditor from './WorkoutPlanEditor'
 import ProfileEditModal from './ProfileEditModal'
 
+const thStyle: React.CSSProperties = {
+  padding: '8px 12px', textAlign: 'left', color: '#ffffff', fontWeight: 600,
+  fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.6px', whiteSpace: 'nowrap',
+}
+
+function InlineNumberCell({ value, onSave, placeholder, format }: {
+  value: number | null
+  onSave: (v: number | null) => void
+  placeholder?: string
+  format?: (v: number) => string
+}) {
+  const [editing, setEditing] = useState(false)
+  const [input, setInput] = useState('')
+  if (editing) return (
+    <input
+      type="number" autoFocus value={input}
+      onChange={e => setInput(e.target.value)}
+      onBlur={() => { onSave(input === '' ? null : Number(input)); setEditing(false) }}
+      onKeyDown={e => { if (e.key === 'Enter') { onSave(input === '' ? null : Number(input)); setEditing(false) } if (e.key === 'Escape') setEditing(false) }}
+      style={{ width: '80px', border: 'none', borderBottom: '2px solid #004aad', background: 'transparent', color: 'var(--text)', fontSize: '0.78rem', outline: 'none', padding: '2px 0' }}
+    />
+  )
+  return (
+    <button onClick={() => { setInput(value != null ? String(value) : ''); setEditing(true) }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px 4px', color: value != null ? 'var(--text)' : 'var(--text-faint)', fontSize: '0.78rem', textAlign: 'right', width: '100%' }}>
+      {value != null ? (format ? format(value) : value) : (placeholder ?? '—')}
+    </button>
+  )
+}
+
+function InlineTextCell({ value, onSave, placeholder }: {
+  value: string | null
+  onSave: (v: string) => void
+  placeholder?: string
+}) {
+  const [editing, setEditing] = useState(false)
+  const [input, setInput] = useState('')
+  if (editing) return (
+    <input
+      type="text" autoFocus value={input}
+      onChange={e => setInput(e.target.value)}
+      onBlur={() => { onSave(input); setEditing(false) }}
+      onKeyDown={e => { if (e.key === 'Enter') { onSave(input); setEditing(false) } if (e.key === 'Escape') setEditing(false) }}
+      style={{ width: '100%', minWidth: '80px', border: 'none', borderBottom: '2px solid #004aad', background: 'transparent', color: 'var(--text)', fontSize: '0.78rem', outline: 'none', padding: '2px 0' }}
+    />
+  )
+  return (
+    <button onClick={() => { setInput(value ?? ''); setEditing(true) }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px 4px', color: value ? 'var(--text)' : 'var(--text-faint)', fontSize: '0.78rem', textAlign: 'left', width: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '200px' }}>
+      {value || placeholder || '—'}
+    </button>
+  )
+}
+
 const TABS = [
   { id: 'overview', label: 'Overzicht' },
+  { id: 'tijdlijn', label: 'Tijdlijn' },
   { id: 'tracking', label: 'Tracking' },
   { id: 'body', label: 'Lichaamssamenstelling' },
   { id: 'checkin', label: 'Check-ins' },
@@ -27,7 +80,7 @@ const TABS = [
 ]
 
 export default function ClientDetailTabs({
-  client, payments, logs, skinfolds, checkins, mealPlan, trainingSchemas, initialTab,
+  client, payments, logs, skinfolds, checkins, mealPlan, trainingSchemas, timeline: initialTimeline, initialTab,
 }: {
   client: Client
   payments: Payment[]
@@ -36,6 +89,7 @@ export default function ClientDetailTabs({
   checkins: WeeklyCheckin[]
   mealPlan: MealPlan | null
   trainingSchemas: (TrainingSchema & { exercises: TrainingExercise[] })[]
+  timeline: WeeklyTimeline[]
   initialTab: string
 }) {
   const [tab, setTab] = useState(initialTab)
@@ -47,6 +101,49 @@ export default function ClientDetailTabs({
   const [prevStepGoal, setPrevStepGoal] = useState<number | null>(client.prev_step_goal)
   const [editingStepGoal, setEditingStepGoal] = useState(false)
   const [stepGoalInput, setStepGoalInput] = useState(client.step_goal != null ? String(client.step_goal) : '')
+  const [timelineMap, setTimelineMap] = useState<Map<number, WeeklyTimeline>>(() => {
+    const m = new Map<number, WeeklyTimeline>()
+    initialTimeline.forEach(t => m.set(t.week_number, t))
+    return m
+  })
+
+  async function saveTimelineField(weekNumber: number, field: string, value: unknown) {
+    setTimelineMap(prev => {
+      const next = new Map(prev)
+      const existing = next.get(weekNumber)
+      next.set(weekNumber, { ...(existing ?? { id: '', client_id: client.id, week_number: weekNumber, phase: null, energy_balance: null, calories_td: null, calories_ntd: null, cardio_target: null, steps_target: null, notes: null, created_at: '', updated_at: '' }), [field]: value })
+      return next
+    })
+    await fetch('/api/coach/clients/timeline', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId: client.id, weekNumber, [field]: value }),
+    })
+  }
+
+  const timelineRows = (() => {
+    const byWeek = new Map<number, { dates: string[], weights: number[], steps: number[], cardio: number[] }>()
+    logs.forEach(l => {
+      const w = l.week_number ?? 0
+      if (!byWeek.has(w)) byWeek.set(w, { dates: [], weights: [], steps: [], cardio: [] })
+      const d = byWeek.get(w)!
+      d.dates.push(l.log_date)
+      if (l.weight_kg) d.weights.push(l.weight_kg)
+      if (l.steps) d.steps.push(l.steps)
+      if (l.cardio_minutes) d.cardio.push(l.cardio_minutes)
+    })
+    const sorted = Array.from(byWeek.entries()).sort((a, b) => a[0] - b[0])
+    return sorted.map(([weekNum, d], i) => {
+      const avgBw = d.weights.length ? +(d.weights.reduce((a, b) => a + b) / d.weights.length).toFixed(1) : null
+      const prevWeek = i > 0 ? sorted[i - 1][1] : null
+      const prevAvgBw = prevWeek && prevWeek.weights.length ? +(prevWeek.weights.reduce((a, b) => a + b) / prevWeek.weights.length).toFixed(1) : null
+      const bwDelta = avgBw !== null && prevAvgBw !== null ? +(avgBw - prevAvgBw).toFixed(1) : null
+      const weekStart = d.dates.length ? [...d.dates].sort()[0] : null
+      const avgSteps = d.steps.length ? Math.round(d.steps.reduce((a, b) => a + b) / d.steps.length) : null
+      const totalCardio = d.cardio.length ? d.cardio.reduce((a, b) => a + b) : null
+      return { weekNum, weekStart, avgBw, bwDelta, avgSteps, totalCardio }
+    })
+  })()
 
   async function saveStepGoal(raw: string) {
     const num = raw === '' ? null : parseInt(raw, 10)
@@ -198,6 +295,100 @@ export default function ClientDetailTabs({
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ── TIJDLIJN ── */}
+      {tab === 'tijdlijn' && (
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden' }}>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
+              <thead>
+                <tr style={{ background: '#004aad' }}>
+                  <th rowSpan={2} style={thStyle}>WEEK</th>
+                  <th rowSpan={2} style={thStyle}>DATUM</th>
+                  <th rowSpan={2} style={thStyle}>FASE</th>
+                  <th rowSpan={2} style={thStyle}>ENERGY<br />BALANCE</th>
+                  <th rowSpan={2} style={thStyle}>GEM. GEW.</th>
+                  <th rowSpan={2} style={{ ...thStyle, color: 'rgba(255,255,255,0.7)' }}>Δ</th>
+                  <th colSpan={2} style={{ ...thStyle, borderBottom: '1px solid rgba(255,255,255,0.2)', textAlign: 'center' }}>INTAKE</th>
+                  <th colSpan={2} style={{ ...thStyle, borderBottom: '1px solid rgba(255,255,255,0.2)', textAlign: 'center' }}>EXPENDITURE</th>
+                  <th rowSpan={2} style={thStyle}>NOTITIES</th>
+                </tr>
+                <tr style={{ background: '#004aad' }}>
+                  <th style={thStyle}>TD</th>
+                  <th style={thStyle}>NTD</th>
+                  <th style={thStyle}>CARDIO</th>
+                  <th style={thStyle}>STAPPEN</th>
+                </tr>
+              </thead>
+              <tbody>
+                {timelineRows.length === 0 ? (
+                  <tr><td colSpan={11} style={{ padding: '48px', textAlign: 'center', color: 'var(--text-faint)' }}>Nog geen logs beschikbaar</td></tr>
+                ) : timelineRows.map(row => {
+                  const meta = timelineMap.get(row.weekNum)
+                  const phase = meta?.phase ?? null
+                  const eb = meta?.energy_balance ?? null
+                  const phaseColor = phase === 'dieting' ? '#22c55e' : phase === 'gaining' ? '#38bdf8' : phase === 'maintenance' ? '#f97316' : 'transparent'
+                  const phaseBg = phase === 'dieting' ? '#dcfce7' : phase === 'gaining' ? '#e0f2fe' : phase === 'maintenance' ? '#ffedd5' : 'var(--surface-2)'
+                  const phaseLabel = phase === 'dieting' ? 'Dieting Phase' : phase === 'gaining' ? 'Gaining Phase' : phase === 'maintenance' ? 'Maintenance' : '—'
+                  const ebLabel = eb === 'deficit' ? 'Deficit' : eb === 'surplus' ? 'Surplus' : eb === 'maintenance' ? 'Maintenance' : '—'
+                  const deltaColor = row.bwDelta === null ? 'var(--text-faint)' : row.bwDelta < 0 ? '#22c55e' : row.bwDelta > 0 ? '#ef4444' : 'var(--text-muted)'
+                  return (
+                    <tr key={row.weekNum} style={{ borderBottom: '1px solid var(--surface-2)' }}>
+                      <td style={{ padding: '8px 14px', fontWeight: 700, color: '#004aad', textAlign: 'center', whiteSpace: 'nowrap' }}>{row.weekNum}</td>
+                      <td style={{ padding: '8px 14px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                        {row.weekStart ? formatDateShort(row.weekStart) : '—'}
+                      </td>
+                      <td style={{ padding: '6px 10px' }}>
+                        <select
+                          value={phase ?? ''}
+                          onChange={e => saveTimelineField(row.weekNum, 'phase', e.target.value || null)}
+                          style={{ background: phaseBg, color: phase ? phaseColor : 'var(--text-faint)', border: `1px solid ${phase ? phaseColor : 'var(--border)'}`, borderRadius: '6px', padding: '4px 8px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', width: '100%', minWidth: '120px' }}
+                        >
+                          <option value="">—</option>
+                          <option value="dieting">Dieting Phase</option>
+                          <option value="gaining">Gaining Phase</option>
+                          <option value="maintenance">Maintenance</option>
+                        </select>
+                      </td>
+                      <td style={{ padding: '6px 10px' }}>
+                        <select
+                          value={eb ?? ''}
+                          onChange={e => saveTimelineField(row.weekNum, 'energy_balance', e.target.value || null)}
+                          style={{ background: 'var(--surface-2)', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: '6px', padding: '4px 8px', fontSize: '0.75rem', cursor: 'pointer', width: '100%', minWidth: '110px' }}
+                        >
+                          <option value="">—</option>
+                          <option value="deficit">Deficit</option>
+                          <option value="surplus">Surplus</option>
+                          <option value="maintenance">Maintenance</option>
+                        </select>
+                      </td>
+                      <td style={{ padding: '8px 14px', fontWeight: 600, textAlign: 'right' }}>{row.avgBw ?? '—'}</td>
+                      <td style={{ padding: '8px 14px', textAlign: 'right', color: deltaColor, fontWeight: 500 }}>
+                        {row.bwDelta === null ? '-' : row.bwDelta > 0 ? `+${row.bwDelta}` : row.bwDelta}
+                      </td>
+                      <td style={{ padding: '6px 8px' }}>
+                        <InlineNumberCell value={meta?.calories_td ?? null} onSave={v => saveTimelineField(row.weekNum, 'calories_td', v)} />
+                      </td>
+                      <td style={{ padding: '6px 8px' }}>
+                        <InlineNumberCell value={meta?.calories_ntd ?? null} onSave={v => saveTimelineField(row.weekNum, 'calories_ntd', v)} />
+                      </td>
+                      <td style={{ padding: '6px 8px' }}>
+                        <InlineTextCell value={meta?.cardio_target ?? null} placeholder={row.totalCardio ? `${row.totalCardio}m` : '/'} onSave={v => saveTimelineField(row.weekNum, 'cardio_target', v || null)} />
+                      </td>
+                      <td style={{ padding: '6px 8px' }}>
+                        <InlineNumberCell value={meta?.steps_target ?? null} placeholder={row.avgSteps ? row.avgSteps.toLocaleString('nl-BE') : undefined} onSave={v => saveTimelineField(row.weekNum, 'steps_target', v)} format={v => v.toLocaleString('nl-BE')} />
+                      </td>
+                      <td style={{ padding: '6px 8px', minWidth: '160px' }}>
+                        <InlineTextCell value={meta?.notes ?? null} placeholder="—" onSave={v => saveTimelineField(row.weekNum, 'notes', v || null)} />
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 

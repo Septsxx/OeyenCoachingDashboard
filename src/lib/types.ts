@@ -205,6 +205,21 @@ export interface TrainingExercise {
   created_at: string
 }
 
+export interface WeeklyTimeline {
+  id: string
+  client_id: string
+  week_number: number
+  phase: 'dieting' | 'gaining' | 'maintenance' | null
+  energy_balance: 'deficit' | 'surplus' | 'maintenance' | null
+  calories_td: number | null
+  calories_ntd: number | null
+  cardio_target: string | null
+  steps_target: number | null
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
 export interface BodyMeasurement {
   id: string
   client_id: string
