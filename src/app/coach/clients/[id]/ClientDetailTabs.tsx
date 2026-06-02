@@ -44,20 +44,21 @@ export default function ClientDetailTabs({
   const [showProfileEdit, setShowProfileEdit] = useState(false)
   const [checkinToAnswer, setCheckinToAnswer] = useState<WeeklyCheckin | null>(null)
   const [stepGoal, setStepGoal] = useState<number | null>(client.step_goal)
-  const [prevStepGoal, setPrevStepGoal] = useState<number | null>(null)
+  const [prevStepGoal, setPrevStepGoal] = useState<number | null>(client.prev_step_goal)
   const [editingStepGoal, setEditingStepGoal] = useState(false)
   const [stepGoalInput, setStepGoalInput] = useState(client.step_goal != null ? String(client.step_goal) : '')
 
   async function saveStepGoal(raw: string) {
     const num = raw === '' ? null : parseInt(raw, 10)
     if (raw !== '' && isNaN(num as number)) return
+    const newPrev = num !== stepGoal ? stepGoal : prevStepGoal
     if (num !== stepGoal) setPrevStepGoal(stepGoal)
     setStepGoal(num)
     setEditingStepGoal(false)
     await fetch('/api/coach/clients/step-goal', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ clientId: client.id, stepGoal: num }),
+      body: JSON.stringify({ clientId: client.id, stepGoal: num, prevStepGoal: newPrev }),
     })
   }
 

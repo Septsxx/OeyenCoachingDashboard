@@ -38,6 +38,7 @@ export interface Client {
   intake_completed: boolean
   notes: string | null
   step_goal: number | null
+  prev_step_goal: number | null
   created_at: string
   updated_at: string
 }
