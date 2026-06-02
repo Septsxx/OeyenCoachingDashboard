@@ -38,7 +38,7 @@ export default function NewClientPage() {
     e.preventDefault()
     setLoading(true)
     setError('')
-    const { error } = await supabase.from('clients').insert({
+    const { data: inserted, error } = await supabase.from('clients').insert({
       ...form,
       height_cm: form.height_cm ? Number(form.height_cm) : null,
       start_weight_kg: form.start_weight_kg ? Number(form.start_weight_kg) : null,
@@ -47,8 +47,21 @@ export default function NewClientPage() {
       gender: form.gender || null,
       activity_level: form.activity_level || null,
       intake_completed: true,
-    })
+    }).select('id').single()
     if (error) { setError(error.message); setLoading(false); return }
+
+    const res = await fetch('/api/invite-client', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: form.email, clientId: inserted.id }),
+    })
+    if (!res.ok) {
+      const body = await res.json()
+      setError(`Klant aangemaakt maar uitnodigingsmail mislukt: ${body.error}`)
+      setLoading(false)
+      return
+    }
+
     router.push('/coach/clients')
   }
 
