@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import ClientDetailTabs from './ClientDetailTabs'
 import type { Client, Payment, DailyLog, SkinfoldMeasurement, WeeklyCheckin, MealPlan, TrainingSchema, TrainingExercise, WeeklyTimeline, CoachSettings } from '@/lib/types'
+import DeleteClientButton from './DeleteClientButton'
 
 export default async function ClientDetailPage({
   params,
@@ -62,6 +63,7 @@ export default async function ClientDetailPage({
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           {client.height_cm && <span style={{ fontSize: '0.82rem', color: 'var(--text-dim)' }}>{client.height_cm} cm</span>}
           {client.start_weight_kg && <span style={{ fontSize: '0.82rem', color: 'var(--text-dim)' }}>Start: {client.start_weight_kg} kg</span>}
+          <DeleteClientButton clientId={client.id} clientName={client.full_name} />
         </div>
       </div>
 
