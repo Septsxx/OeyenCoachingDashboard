@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 
 const NAV = [
   { href: '/client', label: 'Home', icon: '⌂' },
-  { href: '/client/log', label: 'Log', icon: '✎' },
+  { href: '/client/tijdlijn', label: 'Tijdlijn', icon: '≡' },
   { href: '/client/checkin', label: 'Check-in', icon: '↗' },
   { href: '/client/maaltijdplan', label: 'Voeding', icon: '⊜' },
   { href: '/client/training', label: 'Training', icon: '◈' },
