@@ -43,6 +43,21 @@ export default function ClientDetailTabs({
   const [showSkinfoldModal, setShowSkinfoldModal] = useState(false)
   const [showProfileEdit, setShowProfileEdit] = useState(false)
   const [checkinToAnswer, setCheckinToAnswer] = useState<WeeklyCheckin | null>(null)
+  const [stepGoal, setStepGoal] = useState<number | null>(client.step_goal)
+  const [editingStepGoal, setEditingStepGoal] = useState(false)
+  const [stepGoalInput, setStepGoalInput] = useState(client.step_goal != null ? String(client.step_goal) : '')
+
+  async function saveStepGoal(raw: string) {
+    const num = raw === '' ? null : parseInt(raw, 10)
+    if (raw !== '' && isNaN(num as number)) return
+    setStepGoal(num)
+    setEditingStepGoal(false)
+    await fetch('/api/coach/clients/step-goal', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId: client.id, stepGoal: num }),
+    })
+  }
 
   const latestPayment = payments[0] ?? null
   const paymentStatus = getPaymentStatus(latestPayment)
@@ -100,7 +115,7 @@ export default function ClientDetailTabs({
       {/* ── OVERVIEW ── */}
       {tab === 'overview' && (
         <div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px', marginBottom: '24px' }}>
             {[
               { label: 'Startgewicht', value: client.start_weight_kg ? `${client.start_weight_kg} kg` : '—' },
               { label: 'Huidig gewicht', value: currentWeight ? `${currentWeight} kg` : '—' },
@@ -113,6 +128,33 @@ export default function ClientDetailTabs({
                 {'sub' in kpi && kpi.sub && <p style={{ fontSize: '0.72rem', color: 'var(--text-faint)', marginTop: '4px' }}>{kpi.sub}</p>}
               </div>
             ))}
+            {/* Stappendoel — bewerkbaar */}
+            <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '20px' }}>
+              <p style={{ fontSize: '0.7rem', color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>Stappendoel/dag</p>
+              {editingStepGoal ? (
+                <input
+                  type="number"
+                  value={stepGoalInput}
+                  autoFocus
+                  min={0}
+                  max={99999}
+                  onChange={e => setStepGoalInput(e.target.value)}
+                  onBlur={() => saveStepGoal(stepGoalInput)}
+                  onKeyDown={e => { if (e.key === 'Enter') saveStepGoal(stepGoalInput); if (e.key === 'Escape') setEditingStepGoal(false) }}
+                  style={{ fontSize: '1.4rem', fontWeight: 700, width: '100%', border: 'none', borderBottom: '2px solid #004aad', background: 'transparent', color: 'var(--text)', outline: 'none', padding: '0' }}
+                />
+              ) : (
+                <button
+                  onClick={() => { setStepGoalInput(stepGoal != null ? String(stepGoal) : ''); setEditingStepGoal(true) }}
+                  title="Klik om aan te passen"
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'left', width: '100%' }}
+                >
+                  <p style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--text)' }}>
+                    {stepGoal != null ? stepGoal.toLocaleString('nl-BE') : <span style={{ color: 'var(--text-faint)', fontSize: '1rem' }}>Instellen</span>}
+                  </p>
+                </button>
+              )}
+            </div>
           </div>
 
           {weightData.length > 1 && (
