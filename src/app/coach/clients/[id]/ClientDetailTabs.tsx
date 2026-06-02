@@ -123,12 +123,10 @@ export default function ClientDetailTabs({
               { label: 'Startgewicht', value: client.start_weight_kg ? `${client.start_weight_kg} kg` : '—' },
               { label: 'Huidig gewicht', value: currentWeight ? `${currentWeight} kg` : '—' },
               { label: 'Huidig BF%', value: skinfolds.length ? `${skinfolds[skinfolds.length - 1].bf_pct}%` : '—' },
-              { label: 'Betaling', value: paymentStatus.label, color: paymentStatus.color, sub: latestPayment && paymentStatus.days !== null && paymentStatus.days >= 0 ? formatDate(latestPayment.expiry_date) : null },
             ].map(kpi => (
               <div key={kpi.label} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '20px' }}>
                 <p style={{ fontSize: '0.7rem', color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>{kpi.label}</p>
-                <p style={{ fontSize: '1.6rem', fontWeight: 700, color: kpi.color ?? 'var(--text)' }}>{kpi.value}</p>
-                {'sub' in kpi && kpi.sub && <p style={{ fontSize: '0.72rem', color: 'var(--text-faint)', marginTop: '4px' }}>{kpi.sub}</p>}
+                <p style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--text)' }}>{kpi.value}</p>
               </div>
             ))}
             {/* Stappendoel — bewerkbaar */}
@@ -161,6 +159,14 @@ export default function ClientDetailTabs({
                     </p>
                   )}
                 </button>
+              )}
+            </div>
+            {/* Betaling */}
+            <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '20px' }}>
+              <p style={{ fontSize: '0.7rem', color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>Betaling</p>
+              <p style={{ fontSize: '1.6rem', fontWeight: 700, color: paymentStatus.color }}>{paymentStatus.label}</p>
+              {latestPayment && paymentStatus.days !== null && paymentStatus.days >= 0 && (
+                <p style={{ fontSize: '0.72rem', color: 'var(--text-faint)', marginTop: '4px' }}>{formatDate(latestPayment.expiry_date)}</p>
               )}
             </div>
           </div>
