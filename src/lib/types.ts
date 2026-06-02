@@ -205,11 +205,36 @@ export interface TrainingExercise {
   created_at: string
 }
 
+export type PhaseKey = 'dieting' | 'gaining' | 'maintenance' | 'competition' | 'peak_week'
+
+export const DEFAULT_PHASE_LABELS: Record<PhaseKey, string> = {
+  dieting: 'Dieting Phase',
+  gaining: 'Gaining Phase',
+  maintenance: 'Maintenance',
+  competition: 'Competition Phase',
+  peak_week: 'Peak Week',
+}
+
+export const PHASE_COLORS: Record<PhaseKey, { text: string; bg: string; border: string }> = {
+  dieting:     { text: '#16a34a', bg: '#dcfce7', border: '#22c55e' },
+  gaining:     { text: '#0284c7', bg: '#e0f2fe', border: '#38bdf8' },
+  maintenance: { text: '#ea580c', bg: '#ffedd5', border: '#f97316' },
+  competition: { text: '#7c3aed', bg: '#ede9fe', border: '#a855f7' },
+  peak_week:   { text: '#dc2626', bg: '#fee2e2', border: '#ef4444' },
+}
+
+export interface CoachSettings {
+  coach_id: string
+  phase_labels: Partial<Record<PhaseKey, string>>
+  created_at: string
+  updated_at: string
+}
+
 export interface WeeklyTimeline {
   id: string
   client_id: string
   week_number: number
-  phase: 'dieting' | 'gaining' | 'maintenance' | null
+  phase: PhaseKey | null
   energy_balance: 'deficit' | 'surplus' | 'maintenance' | null
   calories_td: number | null
   calories_ntd: number | null

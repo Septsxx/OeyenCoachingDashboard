@@ -4,8 +4,8 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip,
   ResponsiveContainer, CartesianGrid
 } from 'recharts'
-import type { Client, Payment, DailyLog, SkinfoldMeasurement, WeeklyCheckin, MealPlan, TrainingSchema, TrainingExercise, WeeklyTimeline } from '@/lib/types'
-import { PACKAGES } from '@/lib/types'
+import type { Client, Payment, DailyLog, SkinfoldMeasurement, WeeklyCheckin, MealPlan, TrainingSchema, TrainingExercise, WeeklyTimeline, PhaseKey } from '@/lib/types'
+import { PACKAGES, DEFAULT_PHASE_LABELS, PHASE_COLORS } from '@/lib/types'
 import { getPaymentStatus } from '@/lib/payment-utils'
 import { CHART_TOOLTIP, formatDate, formatDateShort } from '@/lib/ui'
 import PaymentModal from './PaymentModal'
@@ -80,7 +80,7 @@ const TABS = [
 ]
 
 export default function ClientDetailTabs({
-  client, payments, logs, skinfolds, checkins, mealPlan, trainingSchemas, timeline: initialTimeline, initialTab,
+  client, payments, logs, skinfolds, checkins, mealPlan, trainingSchemas, timeline: initialTimeline, phaseLabels: initialPhaseLabels, initialTab,
 }: {
   client: Client
   payments: Payment[]
@@ -90,6 +90,7 @@ export default function ClientDetailTabs({
   mealPlan: MealPlan | null
   trainingSchemas: (TrainingSchema & { exercises: TrainingExercise[] })[]
   timeline: WeeklyTimeline[]
+  phaseLabels: Partial<Record<PhaseKey, string>>
   initialTab: string
 }) {
   const [tab, setTab] = useState(initialTab)
@@ -106,6 +107,22 @@ export default function ClientDetailTabs({
     initialTimeline.forEach(t => m.set(t.week_number, t))
     return m
   })
+
+  const [phaseLabels, setPhaseLabels] = useState<Partial<Record<PhaseKey, string>>>(initialPhaseLabels)
+  const [editingLabels, setEditingLabels] = useState(false)
+  const [labelDrafts, setLabelDrafts] = useState<Record<PhaseKey, string>>({ ...DEFAULT_PHASE_LABELS, ...initialPhaseLabels })
+
+  const phaseLabel = (key: PhaseKey) => phaseLabels[key] ?? DEFAULT_PHASE_LABELS[key]
+
+  async function savePhaseLabels() {
+    setPhaseLabels(labelDrafts)
+    setEditingLabels(false)
+    await fetch('/api/coach/settings', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phase_labels: labelDrafts }),
+    })
+  }
 
   async function saveTimelineField(weekNumber: number, field: string, value: unknown) {
     setTimelineMap(prev => {
@@ -300,94 +317,111 @@ export default function ClientDetailTabs({
 
       {/* ── TIJDLIJN ── */}
       {tab === 'tijdlijn' && (
-        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden' }}>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
-              <thead>
-                <tr style={{ background: '#004aad' }}>
-                  <th rowSpan={2} style={thStyle}>WEEK</th>
-                  <th rowSpan={2} style={thStyle}>DATUM</th>
-                  <th rowSpan={2} style={thStyle}>FASE</th>
-                  <th rowSpan={2} style={thStyle}>ENERGY<br />BALANCE</th>
-                  <th rowSpan={2} style={thStyle}>GEM. GEW.</th>
-                  <th rowSpan={2} style={{ ...thStyle, color: 'rgba(255,255,255,0.7)' }}>Δ</th>
-                  <th colSpan={2} style={{ ...thStyle, borderBottom: '1px solid rgba(255,255,255,0.2)', textAlign: 'center' }}>INTAKE</th>
-                  <th colSpan={2} style={{ ...thStyle, borderBottom: '1px solid rgba(255,255,255,0.2)', textAlign: 'center' }}>EXPENDITURE</th>
-                  <th rowSpan={2} style={thStyle}>NOTITIES</th>
-                </tr>
-                <tr style={{ background: '#004aad' }}>
-                  <th style={thStyle}>TD</th>
-                  <th style={thStyle}>NTD</th>
-                  <th style={thStyle}>CARDIO</th>
-                  <th style={thStyle}>STAPPEN</th>
-                </tr>
-              </thead>
-              <tbody>
-                {timelineRows.length === 0 ? (
-                  <tr><td colSpan={11} style={{ padding: '48px', textAlign: 'center', color: 'var(--text-faint)' }}>Nog geen logs beschikbaar</td></tr>
-                ) : timelineRows.map(row => {
-                  const meta = timelineMap.get(row.weekNum)
-                  const phase = meta?.phase ?? null
-                  const eb = meta?.energy_balance ?? null
-                  const phaseColor = phase === 'dieting' ? '#22c55e' : phase === 'gaining' ? '#38bdf8' : phase === 'maintenance' ? '#f97316' : 'transparent'
-                  const phaseBg = phase === 'dieting' ? '#dcfce7' : phase === 'gaining' ? '#e0f2fe' : phase === 'maintenance' ? '#ffedd5' : 'var(--surface-2)'
-                  const phaseLabel = phase === 'dieting' ? 'Dieting Phase' : phase === 'gaining' ? 'Gaining Phase' : phase === 'maintenance' ? 'Maintenance' : '—'
-                  const ebLabel = eb === 'deficit' ? 'Deficit' : eb === 'surplus' ? 'Surplus' : eb === 'maintenance' ? 'Maintenance' : '—'
-                  const deltaColor = row.bwDelta === null ? 'var(--text-faint)' : row.bwDelta < 0 ? '#22c55e' : row.bwDelta > 0 ? '#ef4444' : 'var(--text-muted)'
-                  return (
-                    <tr key={row.weekNum} style={{ borderBottom: '1px solid var(--surface-2)' }}>
-                      <td style={{ padding: '8px 14px', fontWeight: 700, color: '#004aad', textAlign: 'center', whiteSpace: 'nowrap' }}>{row.weekNum}</td>
-                      <td style={{ padding: '8px 14px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
-                        {row.weekStart ? formatDateShort(row.weekStart) : '—'}
-                      </td>
-                      <td style={{ padding: '6px 10px' }}>
-                        <select
-                          value={phase ?? ''}
-                          onChange={e => saveTimelineField(row.weekNum, 'phase', e.target.value || null)}
-                          style={{ background: phaseBg, color: phase ? phaseColor : 'var(--text-faint)', border: `1px solid ${phase ? phaseColor : 'var(--border)'}`, borderRadius: '6px', padding: '4px 8px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', width: '100%', minWidth: '120px' }}
-                        >
-                          <option value="">—</option>
-                          <option value="dieting">Dieting Phase</option>
-                          <option value="gaining">Gaining Phase</option>
-                          <option value="maintenance">Maintenance</option>
-                        </select>
-                      </td>
-                      <td style={{ padding: '6px 10px' }}>
-                        <select
-                          value={eb ?? ''}
-                          onChange={e => saveTimelineField(row.weekNum, 'energy_balance', e.target.value || null)}
-                          style={{ background: 'var(--surface-2)', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: '6px', padding: '4px 8px', fontSize: '0.75rem', cursor: 'pointer', width: '100%', minWidth: '110px' }}
-                        >
-                          <option value="">—</option>
-                          <option value="deficit">Deficit</option>
-                          <option value="surplus">Surplus</option>
-                          <option value="maintenance">Maintenance</option>
-                        </select>
-                      </td>
-                      <td style={{ padding: '8px 14px', fontWeight: 600, textAlign: 'right' }}>{row.avgBw ?? '—'}</td>
-                      <td style={{ padding: '8px 14px', textAlign: 'right', color: deltaColor, fontWeight: 500 }}>
-                        {row.bwDelta === null ? '-' : row.bwDelta > 0 ? `+${row.bwDelta}` : row.bwDelta}
-                      </td>
-                      <td style={{ padding: '6px 8px' }}>
-                        <InlineNumberCell value={meta?.calories_td ?? null} onSave={v => saveTimelineField(row.weekNum, 'calories_td', v)} />
-                      </td>
-                      <td style={{ padding: '6px 8px' }}>
-                        <InlineNumberCell value={meta?.calories_ntd ?? null} onSave={v => saveTimelineField(row.weekNum, 'calories_ntd', v)} />
-                      </td>
-                      <td style={{ padding: '6px 8px' }}>
-                        <InlineTextCell value={meta?.cardio_target ?? null} placeholder={row.totalCardio ? `${row.totalCardio}m` : '/'} onSave={v => saveTimelineField(row.weekNum, 'cardio_target', v || null)} />
-                      </td>
-                      <td style={{ padding: '6px 8px' }}>
-                        <InlineNumberCell value={meta?.steps_target ?? null} placeholder={row.avgSteps ? row.avgSteps.toLocaleString('nl-BE') : undefined} onSave={v => saveTimelineField(row.weekNum, 'steps_target', v)} format={v => v.toLocaleString('nl-BE')} />
-                      </td>
-                      <td style={{ padding: '6px 8px', minWidth: '160px' }}>
-                        <InlineTextCell value={meta?.notes ?? null} placeholder="—" onSave={v => saveTimelineField(row.weekNum, 'notes', v || null)} />
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+        <div>
+          {/* Label editor */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>
+            {editingLabels ? (
+              <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '10px', minWidth: '320px' }}>
+                <p style={{ fontSize: '0.78rem', fontWeight: 600, marginBottom: '4px' }}>Fasenamen aanpassen</p>
+                {(Object.keys(DEFAULT_PHASE_LABELS) as PhaseKey[]).map(key => (
+                  <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span style={{ width: '12px', height: '12px', borderRadius: '3px', background: PHASE_COLORS[key].border, flexShrink: 0 }} />
+                    <input
+                      value={labelDrafts[key]}
+                      onChange={e => setLabelDrafts(d => ({ ...d, [key]: e.target.value }))}
+                      style={{ flex: 1, border: '1px solid var(--border)', borderRadius: '6px', padding: '5px 8px', fontSize: '0.78rem', background: 'var(--surface-2)', color: 'var(--text)', outline: 'none' }}
+                    />
+                  </div>
+                ))}
+                <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                  <button onClick={savePhaseLabels} style={{ background: '#004aad', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 14px', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}>Opslaan</button>
+                  <button onClick={() => { setEditingLabels(false); setLabelDrafts({ ...DEFAULT_PHASE_LABELS, ...phaseLabels }) }} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: '6px', padding: '6px 14px', fontSize: '0.78rem', cursor: 'pointer', color: 'var(--text-muted)' }}>Annuleren</button>
+                </div>
+              </div>
+            ) : (
+              <button onClick={() => setEditingLabels(true)} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: '7px', padding: '6px 14px', fontSize: '0.78rem', cursor: 'pointer', color: 'var(--text-muted)' }}>
+                Fases aanpassen
+              </button>
+            )}
+          </div>
+
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden' }}>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
+                <thead>
+                  <tr style={{ background: '#004aad' }}>
+                    <th rowSpan={2} style={thStyle}>WEEK</th>
+                    <th rowSpan={2} style={thStyle}>DATUM</th>
+                    <th rowSpan={2} style={thStyle}>FASE</th>
+                    <th rowSpan={2} style={thStyle}>ENERGY<br />BALANCE</th>
+                    <th rowSpan={2} style={thStyle}>GEM. GEW.</th>
+                    <th rowSpan={2} style={{ ...thStyle, color: 'rgba(255,255,255,0.7)' }}>Δ</th>
+                    <th colSpan={2} style={{ ...thStyle, borderBottom: '1px solid rgba(255,255,255,0.2)', textAlign: 'center' }}>EXPENDITURE</th>
+                    <th rowSpan={2} style={thStyle}>NOTITIES</th>
+                  </tr>
+                  <tr style={{ background: '#004aad' }}>
+                    <th style={thStyle}>CARDIO</th>
+                    <th style={thStyle}>STAPPEN</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {timelineRows.length === 0 ? (
+                    <tr><td colSpan={9} style={{ padding: '48px', textAlign: 'center', color: 'var(--text-faint)' }}>Nog geen logs beschikbaar</td></tr>
+                  ) : timelineRows.map(row => {
+                    const meta = timelineMap.get(row.weekNum)
+                    const phase = meta?.phase ?? null
+                    const eb = meta?.energy_balance ?? null
+                    const colors = phase ? PHASE_COLORS[phase] : null
+                    const deltaColor = row.bwDelta === null ? 'var(--text-faint)' : row.bwDelta < 0 ? '#16a34a' : row.bwDelta > 0 ? '#dc2626' : 'var(--text-muted)'
+                    return (
+                      <tr key={row.weekNum} style={{ borderBottom: '1px solid var(--surface-2)' }}>
+                        <td style={{ padding: '8px 14px', fontWeight: 700, color: '#004aad', textAlign: 'center', whiteSpace: 'nowrap' }}>{row.weekNum}</td>
+                        <td style={{ padding: '8px 14px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                          {row.weekStart ? formatDateShort(row.weekStart) : '—'}
+                        </td>
+                        <td style={{ padding: '6px 10px' }}>
+                          <select
+                            value={phase ?? ''}
+                            onChange={e => saveTimelineField(row.weekNum, 'phase', e.target.value || null)}
+                            style={{ background: colors ? colors.bg : 'var(--surface-2)', color: colors ? colors.text : 'var(--text-faint)', border: `1px solid ${colors ? colors.border : 'var(--border)'}`, borderRadius: '6px', padding: '4px 8px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', width: '100%', minWidth: '130px' }}
+                          >
+                            <option value="">—</option>
+                            {(Object.keys(DEFAULT_PHASE_LABELS) as PhaseKey[]).map(key => (
+                              <option key={key} value={key}>{phaseLabel(key)}</option>
+                            ))}
+                          </select>
+                        </td>
+                        <td style={{ padding: '6px 10px' }}>
+                          <select
+                            value={eb ?? ''}
+                            onChange={e => saveTimelineField(row.weekNum, 'energy_balance', e.target.value || null)}
+                            style={{ background: 'var(--surface-2)', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: '6px', padding: '4px 8px', fontSize: '0.75rem', cursor: 'pointer', width: '100%', minWidth: '110px' }}
+                          >
+                            <option value="">—</option>
+                            <option value="deficit">Deficit</option>
+                            <option value="surplus">Surplus</option>
+                            <option value="maintenance">Maintenance</option>
+                          </select>
+                        </td>
+                        <td style={{ padding: '8px 14px', fontWeight: 600, textAlign: 'right' }}>{row.avgBw ?? '—'}</td>
+                        <td style={{ padding: '8px 14px', textAlign: 'right', color: deltaColor, fontWeight: 500 }}>
+                          {row.bwDelta === null ? '-' : row.bwDelta > 0 ? `+${row.bwDelta}` : row.bwDelta}
+                        </td>
+                        <td style={{ padding: '6px 8px' }}>
+                          <InlineTextCell value={meta?.cardio_target ?? null} placeholder={row.totalCardio ? `${row.totalCardio}m` : '/'} onSave={v => saveTimelineField(row.weekNum, 'cardio_target', v || null)} />
+                        </td>
+                        <td style={{ padding: '6px 8px' }}>
+                          <InlineNumberCell value={meta?.steps_target ?? null} placeholder={row.avgSteps ? row.avgSteps.toLocaleString('nl-BE') : undefined} onSave={v => saveTimelineField(row.weekNum, 'steps_target', v)} format={v => v.toLocaleString('nl-BE')} />
+                        </td>
+                        <td style={{ padding: '6px 8px', minWidth: '160px' }}>
+                          <InlineTextCell value={meta?.notes ?? null} placeholder="—" onSave={v => saveTimelineField(row.weekNum, 'notes', v || null)} />
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
