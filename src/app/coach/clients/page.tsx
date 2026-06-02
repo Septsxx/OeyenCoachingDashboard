@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import type { Client, Payment } from '@/lib/types'
 import { getPaymentStatus, packageShortLabel } from '@/lib/payment-utils'
+import { StepGoalCell } from './StepGoalCell'
 
 function ComplianceBadge({ count }: { count: number }) {
   const color = count >= 6 ? '#22C55E' : count >= 4 ? '#F59E0B' : count >= 2 ? '#F97316' : '#EF4444'
@@ -70,11 +71,11 @@ export default async function ClientsPage() {
 
       <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden' }}>
         <div style={{
-          display: 'grid', gridTemplateColumns: '1fr 1fr 110px 140px 100px 90px',
+          display: 'grid', gridTemplateColumns: '1fr 1fr 110px 100px 140px 100px 90px',
           padding: '12px 20px', borderBottom: '1px solid var(--surface-2)',
           fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.8px',
         }}>
-          <span>Naam</span><span>E-mail</span><span>Pakket</span><span>Betaling</span><span>Logs 7d</span><span></span>
+          <span>Naam</span><span>E-mail</span><span>Pakket</span><span>Stappen/doel</span><span>Betaling</span><span>Logs 7d</span><span></span>
         </div>
 
         {allClients.length === 0 ? (
@@ -92,7 +93,7 @@ export default async function ClientsPage() {
             const wk = lastCheckin.get(client.id)
             return (
               <div key={client.id} style={{
-                display: 'grid', gridTemplateColumns: '1fr 1fr 110px 140px 100px 90px',
+                display: 'grid', gridTemplateColumns: '1fr 1fr 110px 100px 140px 100px 90px',
                 padding: '14px 20px', borderBottom: '1px solid var(--surface-2)', alignItems: 'center',
               }}>
                 <Link href={`/coach/clients/${client.id}`} style={{ textDecoration: 'none' }}>
@@ -101,6 +102,7 @@ export default async function ClientsPage() {
                 </Link>
                 <span style={{ fontSize: '0.82rem', color: 'var(--text-dim)' }}>{client.email}</span>
                 <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>{packageShortLabel(p?.package)}</span>
+                <StepGoalCell clientId={client.id} initial={client.step_goal} />
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', fontSize: '0.72rem',
                   padding: '3px 10px', borderRadius: '99px',
