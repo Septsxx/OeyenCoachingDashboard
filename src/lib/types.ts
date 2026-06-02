@@ -43,6 +43,17 @@ export interface Client {
   updated_at: string
 }
 
+export interface Supplement {
+  id: string
+  client_id: string
+  name: string
+  dose: string | null
+  timing: string | null
+  notes: string | null
+  sort_order: number
+  created_at: string
+}
+
 export interface Payment {
   id: string
   client_id: string

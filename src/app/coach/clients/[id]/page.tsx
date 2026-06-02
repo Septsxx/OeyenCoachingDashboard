@@ -3,7 +3,7 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import ClientDetailTabs from './ClientDetailTabs'
-import type { Client, Payment, DailyLog, SkinfoldMeasurement, WeeklyCheckin, MealPlan, TrainingSchema, TrainingExercise, WeeklyTimeline, CoachSettings } from '@/lib/types'
+import type { Client, Payment, DailyLog, SkinfoldMeasurement, WeeklyCheckin, MealPlan, TrainingSchema, TrainingExercise, WeeklyTimeline, CoachSettings, Supplement } from '@/lib/types'
 import DeleteClientButton from './DeleteClientButton'
 
 export default async function ClientDetailPage({
@@ -29,6 +29,7 @@ export default async function ClientDetailPage({
     { data: rawSchemas },
     { data: timeline },
     { data: coachSettings },
+    { data: supplements },
   ] = await Promise.all([
     supabase.from('clients').select('*').eq('id', id).single() as unknown as Promise<{ data: Client | null }>,
     supabase.from('payments').select('*').eq('client_id', id).order('payment_date', { ascending: false }) as unknown as Promise<{ data: Payment[] | null }>,
@@ -39,6 +40,7 @@ export default async function ClientDetailPage({
     supabase.from('training_schemas').select('*, training_exercises(*)').eq('client_id', id).order('created_at') as unknown as Promise<{ data: (TrainingSchema & { training_exercises: TrainingExercise[] })[] | null }>,
     supabase.from('weekly_timeline').select('*').eq('client_id', id).order('week_number') as unknown as Promise<{ data: WeeklyTimeline[] | null }>,
     supabase.from('coach_settings').select('*').eq('coach_id', user.id).single() as unknown as Promise<{ data: CoachSettings | null }>,
+    supabase.from('supplements').select('*').eq('client_id', id).order('sort_order') as unknown as Promise<{ data: Supplement[] | null }>,
   ])
 
   const trainingSchemas = (rawSchemas ?? []).map(({ training_exercises, ...s }) => ({
@@ -78,6 +80,7 @@ export default async function ClientDetailPage({
         timeline={timeline ?? []}
         phaseLabels={coachSettings?.phase_labels ?? {}}
         initialTab={tab ?? 'overview'}
+        supplements={supplements ?? []}
       />
     </div>
   )

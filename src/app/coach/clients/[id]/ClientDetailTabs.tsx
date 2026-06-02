@@ -4,7 +4,7 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip,
   ResponsiveContainer, CartesianGrid
 } from 'recharts'
-import type { Client, Payment, DailyLog, SkinfoldMeasurement, WeeklyCheckin, MealPlan, TrainingSchema, TrainingExercise, WeeklyTimeline, PhaseKey } from '@/lib/types'
+import type { Client, Payment, DailyLog, SkinfoldMeasurement, WeeklyCheckin, MealPlan, TrainingSchema, TrainingExercise, WeeklyTimeline, PhaseKey, Supplement } from '@/lib/types'
 import { PACKAGES, DEFAULT_PHASE_LABELS, PHASE_COLORS } from '@/lib/types'
 import { getPaymentStatus } from '@/lib/payment-utils'
 import { CHART_TOOLTIP, formatDate, formatDateShort } from '@/lib/ui'
@@ -75,12 +75,13 @@ const TABS = [
   { id: 'checkin', label: 'Check-ins' },
   { id: 'mealplan', label: 'Voedingsplan' },
   { id: 'training', label: 'Trainingsschema' },
+  { id: 'supplementen', label: 'Supplementen' },
   { id: 'payments', label: 'Betalingen' },
   { id: 'profile', label: 'Profiel' },
 ]
 
 export default function ClientDetailTabs({
-  client, payments, logs, skinfolds, checkins, mealPlan, trainingSchemas, timeline: initialTimeline, phaseLabels: initialPhaseLabels, initialTab,
+  client, payments, logs, skinfolds, checkins, mealPlan, trainingSchemas, timeline: initialTimeline, phaseLabels: initialPhaseLabels, initialTab, supplements: initialSupplements,
 }: {
   client: Client
   payments: Payment[]
@@ -92,6 +93,7 @@ export default function ClientDetailTabs({
   timeline: WeeklyTimeline[]
   phaseLabels: Partial<Record<PhaseKey, string>>
   initialTab: string
+  supplements: Supplement[]
 }) {
   const [tab, setTab] = useState(initialTab)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
@@ -108,11 +110,48 @@ export default function ClientDetailTabs({
     return m
   })
 
+  const [supplements, setSupplements] = useState<Supplement[]>(initialSupplements)
+  const [addingSupp, setAddingSupp] = useState(false)
+  const [newSupp, setNewSupp] = useState({ name: '', dose: '', timing: '', notes: '' })
+
   const [phaseLabels, setPhaseLabels] = useState<Partial<Record<PhaseKey, string>>>(initialPhaseLabels)
   const [editingLabels, setEditingLabels] = useState(false)
   const [labelDrafts, setLabelDrafts] = useState<Record<PhaseKey, string>>({ ...DEFAULT_PHASE_LABELS, ...initialPhaseLabels })
 
   const phaseLabel = (key: PhaseKey) => phaseLabels[key] ?? DEFAULT_PHASE_LABELS[key]
+
+  async function addSupplement() {
+    if (!newSupp.name.trim()) return
+    const res = await fetch('/api/coach/clients/supplements', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId: client.id, name: newSupp.name.trim(), dose: newSupp.dose.trim() || null, timing: newSupp.timing.trim() || null, notes: newSupp.notes.trim() || null, sort_order: supplements.length }),
+    })
+    const data = await res.json()
+    if (data.id) {
+      setSupplements(prev => [...prev, data])
+      setNewSupp({ name: '', dose: '', timing: '', notes: '' })
+      setAddingSupp(false)
+    }
+  }
+
+  async function updateSupplement(id: string, field: string, value: string | null) {
+    setSupplements(prev => prev.map(s => s.id === id ? { ...s, [field]: value } : s))
+    await fetch('/api/coach/clients/supplements', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, [field]: value }),
+    })
+  }
+
+  async function deleteSupplement(id: string) {
+    setSupplements(prev => prev.filter(s => s.id !== id))
+    await fetch('/api/coach/clients/supplements', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
+  }
 
   async function savePhaseLabels() {
     setPhaseLabels(labelDrafts)
@@ -653,6 +692,116 @@ export default function ClientDetailTabs({
       {/* ── TRAINING ── */}
       {tab === 'training' && (
         <WorkoutPlanEditor clientId={client.id} initialSchemas={trainingSchemas} />
+      )}
+
+      {/* ── SUPPLEMENTEN ── */}
+      {tab === 'supplementen' && (
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+            <button onClick={() => setAddingSupp(true)} style={{
+              background: '#004aad', color: '#ffffff', padding: '8px 18px', borderRadius: '8px',
+              border: 'none', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer',
+            }}>
+              + Supplement toevoegen
+            </button>
+          </div>
+
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden' }}>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
+                <thead>
+                  <tr style={{ background: '#004aad' }}>
+                    {['SUPPLEMENT', 'DOSIS', 'WANNEER?', 'NOTITIES / VOORDELEN', ''].map(h => (
+                      <th key={h} style={{ ...thStyle, textAlign: h === '' ? 'center' : 'left' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {supplements.length === 0 && !addingSupp ? (
+                    <tr>
+                      <td colSpan={5} style={{ padding: '48px', textAlign: 'center', color: 'var(--text-faint)' }}>
+                        Nog geen supplementen toegevoegd
+                      </td>
+                    </tr>
+                  ) : (
+                    supplements.map((s, i) => (
+                      <tr key={s.id} style={{ borderBottom: '1px solid var(--surface-2)', background: i % 2 === 0 ? 'var(--surface)' : 'var(--surface-2)' }}>
+                        <td style={{ padding: '6px 10px', minWidth: '160px' }}>
+                          <InlineTextCell value={s.name} onSave={v => updateSupplement(s.id, 'name', v || null)} />
+                        </td>
+                        <td style={{ padding: '6px 10px', minWidth: '80px' }}>
+                          <InlineTextCell value={s.dose} placeholder="—" onSave={v => updateSupplement(s.id, 'dose', v || null)} />
+                        </td>
+                        <td style={{ padding: '6px 10px', minWidth: '100px' }}>
+                          <InlineTextCell value={s.timing} placeholder="—" onSave={v => updateSupplement(s.id, 'timing', v || null)} />
+                        </td>
+                        <td style={{ padding: '6px 10px', minWidth: '200px' }}>
+                          <InlineTextCell value={s.notes} placeholder="—" onSave={v => updateSupplement(s.id, 'notes', v || null)} />
+                        </td>
+                        <td style={{ padding: '6px 10px', textAlign: 'center' }}>
+                          <button
+                            onClick={() => deleteSupplement(s.id)}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', fontSize: '1rem', lineHeight: 1, padding: '2px 6px' }}
+                            title="Verwijderen"
+                          >
+                            ×
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                  {addingSupp && (
+                    <tr style={{ borderBottom: '1px solid var(--surface-2)', background: 'var(--surface-2)' }}>
+                      <td style={{ padding: '6px 10px' }}>
+                        <input
+                          autoFocus
+                          value={newSupp.name}
+                          onChange={e => setNewSupp(p => ({ ...p, name: e.target.value }))}
+                          onKeyDown={e => { if (e.key === 'Enter') addSupplement(); if (e.key === 'Escape') setAddingSupp(false) }}
+                          placeholder="Naam supplement"
+                          style={{ width: '100%', border: 'none', borderBottom: '2px solid #004aad', background: 'transparent', color: 'var(--text)', fontSize: '0.82rem', outline: 'none', padding: '2px 0' }}
+                        />
+                      </td>
+                      <td style={{ padding: '6px 10px' }}>
+                        <input
+                          value={newSupp.dose}
+                          onChange={e => setNewSupp(p => ({ ...p, dose: e.target.value }))}
+                          onKeyDown={e => { if (e.key === 'Enter') addSupplement(); if (e.key === 'Escape') setAddingSupp(false) }}
+                          placeholder="bv. 10gr"
+                          style={{ width: '100%', border: 'none', borderBottom: '1px solid var(--border)', background: 'transparent', color: 'var(--text)', fontSize: '0.82rem', outline: 'none', padding: '2px 0' }}
+                        />
+                      </td>
+                      <td style={{ padding: '6px 10px' }}>
+                        <input
+                          value={newSupp.timing}
+                          onChange={e => setNewSupp(p => ({ ...p, timing: e.target.value }))}
+                          onKeyDown={e => { if (e.key === 'Enter') addSupplement(); if (e.key === 'Escape') setAddingSupp(false) }}
+                          placeholder="bv. Intra, 's morgens"
+                          style={{ width: '100%', border: 'none', borderBottom: '1px solid var(--border)', background: 'transparent', color: 'var(--text)', fontSize: '0.82rem', outline: 'none', padding: '2px 0' }}
+                        />
+                      </td>
+                      <td style={{ padding: '6px 10px' }}>
+                        <input
+                          value={newSupp.notes}
+                          onChange={e => setNewSupp(p => ({ ...p, notes: e.target.value }))}
+                          onKeyDown={e => { if (e.key === 'Enter') addSupplement(); if (e.key === 'Escape') setAddingSupp(false) }}
+                          placeholder="Notities / voordelen"
+                          style={{ width: '100%', border: 'none', borderBottom: '1px solid var(--border)', background: 'transparent', color: 'var(--text)', fontSize: '0.82rem', outline: 'none', padding: '2px 0' }}
+                        />
+                      </td>
+                      <td style={{ padding: '6px 10px', textAlign: 'center' }}>
+                        <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                          <button onClick={addSupplement} style={{ background: '#004aad', color: '#fff', border: 'none', borderRadius: '4px', padding: '3px 10px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}>✓</button>
+                          <button onClick={() => setAddingSupp(false)} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: '4px', padding: '3px 8px', fontSize: '0.75rem', cursor: 'pointer', color: 'var(--text-muted)' }}>×</button>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ── PAYMENTS ── */}
