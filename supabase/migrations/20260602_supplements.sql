@@ -17,3 +17,8 @@ CREATE POLICY "Coach can manage supplements" ON supplements
       SELECT 1 FROM clients c WHERE c.id = supplements.client_id AND c.coach_id = auth.uid()
     )
   );
+
+CREATE POLICY "Client reads own supplements" ON supplements
+  FOR SELECT USING (
+    client_id IN (SELECT id FROM clients WHERE user_id = auth.uid())
+  );

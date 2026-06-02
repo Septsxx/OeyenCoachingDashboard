@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { format, getISOWeek } from 'date-fns'
 import { LABEL, BTN_PRIMARY } from '@/lib/ui'
+import type { Supplement } from '@/lib/types'
 
 export default function CheckinPage() {
   const supabase = createClient()
@@ -12,6 +13,7 @@ export default function CheckinPage() {
   const [clientId, setClientId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [supplements, setSupplements] = useState<Supplement[]>([])
   const [form, setForm] = useState({
     gym_performance: '',
     recovery: '',
@@ -42,6 +44,8 @@ export default function CheckinPage() {
       }
       if (!clientId) { router.push('/login'); return }
       setClientId(clientId)
+      const { data: supps } = await supabase.from('supplements').select('*').eq('client_id', clientId).order('sort_order')
+      setSupplements(supps ?? [])
     }
     load()
   }, [])
@@ -98,6 +102,34 @@ export default function CheckinPage() {
             </div>
           ))}
         </div>
+
+        {/* Supplementen */}
+        {supplements.length > 0 && (
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px', marginBottom: '16px' }}>
+            <p style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1.2px', marginBottom: '16px' }}>Supplementen</p>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
+                <thead>
+                  <tr style={{ background: '#004aad' }}>
+                    {['Supplement', 'Dosis', 'Wanneer?', 'Notities'].map(h => (
+                      <th key={h} style={{ padding: '8px 12px', textAlign: 'left', color: '#ffffff', fontWeight: 600, fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.6px', whiteSpace: 'nowrap' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {supplements.map((s, i) => (
+                    <tr key={s.id} style={{ borderBottom: '1px solid var(--surface-2)', background: i % 2 === 0 ? 'var(--surface)' : 'var(--surface-2)' }}>
+                      <td style={{ padding: '9px 12px', fontWeight: 600 }}>{s.name}</td>
+                      <td style={{ padding: '9px 12px', color: '#004aad', fontWeight: 600 }}>{s.dose ?? '—'}</td>
+                      <td style={{ padding: '9px 12px', color: 'var(--text-muted)' }}>{s.timing ?? '—'}</td>
+                      <td style={{ padding: '9px 12px', color: 'var(--text-dim)' }}>{s.notes ?? ''}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
         {/* Training context */}
         <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px', marginBottom: '24px' }}>
