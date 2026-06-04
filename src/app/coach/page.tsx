@@ -99,8 +99,16 @@ export default async function CoachDashboard() {
     .limit(6) as { data: (Appointment & { clients: { full_name: string } | null })[] | null }
 
   return (
-    <div style={{ padding: '32px' }}>
-      <style>{`.client-link:hover { background: var(--surface-2) !important; }`}</style>
+    <div style={{ padding: 'clamp(16px, 4vw, 32px)' }}>
+      <style>{`
+        .client-link:hover { background: var(--surface-2) !important; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 32px; }
+        .dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+        @media (min-width: 768px) {
+          .kpi-grid { grid-template-columns: repeat(4, 1fr); }
+          .dashboard-grid { grid-template-columns: 1fr 1fr; }
+        }
+      `}</style>
       <div style={{ marginBottom: '32px' }}>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '4px' }}>Dashboard</h1>
         <p style={{ color: 'var(--text-dim)', fontSize: '0.85rem' }}>
@@ -109,7 +117,7 @@ export default async function CoachDashboard() {
       </div>
 
       {/* KPI Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '32px' }}>
+      <div className="kpi-grid">
         {[
           { icon: Users, label: 'Actieve klanten', value: activeClients.length, color: 'var(--text)' },
           { icon: CheckCircle, label: 'Betalingen OK', value: activeClients.length - expiringSoon.length - expired.length, color: '#22C55E' },
@@ -128,7 +136,7 @@ export default async function CoachDashboard() {
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+      <div className="dashboard-grid">
         {/* All Clients */}
         <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden' }}>
           <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid var(--surface-2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
