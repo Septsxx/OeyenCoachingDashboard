@@ -72,7 +72,7 @@ export default async function PaymentsPage() {
     .sort((a, b) => a.daysLeft - b.daysLeft)
 
   return (
-    <div style={{ padding: '32px' }}>
+    <div className="page-pad">
       <div style={{ marginBottom: '32px' }}>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '4px' }}>Financiën</h1>
         <p style={{ color: 'var(--text-dim)', fontSize: '0.85rem' }}>{all.length} betalingen geregistreerd</p>

@@ -79,3 +79,8 @@ select option { background: var(--surface-2); }
     padding-bottom: 4px;
   }
 }
+
+.page-pad { padding: 32px; }
+@media (max-width: 767px) {
+  .page-pad { padding: 16px; }
+}
