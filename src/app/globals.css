@@ -71,6 +71,7 @@ select option { background: var(--surface-2); }
 .macro-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 
 @media (max-width: 500px) {
+  .cols-2 { grid-template-columns: 1fr; }
   .cols-3 { grid-template-columns: 1fr 1fr; }
   .macro-cards {
     grid-template-columns: repeat(3, minmax(130px, 1fr));
@@ -81,6 +82,8 @@ select option { background: var(--surface-2); }
 }
 
 .page-pad { padding: 32px; }
+.card-pad { padding: 24px; }
 @media (max-width: 767px) {
   .page-pad { padding: 16px; }
+  .card-pad { padding: 16px; }
 }

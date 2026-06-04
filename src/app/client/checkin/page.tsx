@@ -87,7 +87,7 @@ export default function CheckinPage() {
       <p style={{ color: 'var(--text-dim)', fontSize: '0.85rem', marginBottom: '28px' }}>Week {getISOWeek(new Date())} · {format(new Date(), 'dd/MM/yyyy')}</p>
 
       <form onSubmit={handleSubmit}>
-        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div className="card-pad" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {textFields.map(([key, label, placeholder]) => (
             <div key={key}>
               <label style={LABEL}>{label}</label>
@@ -105,7 +105,7 @@ export default function CheckinPage() {
 
         {/* Supplementen */}
         {supplements.length > 0 && (
-          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px', marginBottom: '16px' }}>
+          <div className="card-pad" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', marginBottom: '16px' }}>
             <p style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1.2px', marginBottom: '16px' }}>Supplementen</p>
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
@@ -132,7 +132,7 @@ export default function CheckinPage() {
         )}
 
         {/* Training context */}
-        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px', marginBottom: '24px' }}>
+        <div className="card-pad" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', marginBottom: '24px' }}>
           <p style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1.2px', marginBottom: '16px' }}>Trainingscontext</p>
           <div className="cols-2">
             <div>

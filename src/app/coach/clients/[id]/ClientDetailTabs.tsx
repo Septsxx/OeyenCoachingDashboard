@@ -658,7 +658,7 @@ export default function ClientDetailTabs({
                       <span style={{ fontSize: '0.72rem', color: '#22C55E' }}>Beantwoord</span>
                     )}
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '0.82rem' }}>
+                  <div className="cols-2" style={{ gap: '12px', fontSize: '0.82rem' }}>
                     {[
                       ['Gym prestaties', c.gym_performance],
                       ['Herstel', c.recovery],

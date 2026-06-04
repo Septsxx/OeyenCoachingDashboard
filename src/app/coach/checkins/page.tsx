@@ -24,7 +24,7 @@ export default async function CheckinsPage() {
   const answered = all.filter(c => c.coach_response)
 
   return (
-    <div style={{ padding: '32px' }}>
+    <div className="page-pad">
       <div style={{ marginBottom: '32px' }}>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '4px' }}>Check-ins</h1>
         <p style={{ color: 'var(--text-dim)', fontSize: '0.85rem' }}>{unanswered.length} onbeantwoord · {answered.length} beantwoord</p>
@@ -38,20 +38,20 @@ export default async function CheckinsPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {unanswered.map(c => (
               <Link key={c.id} href={`/coach/clients/${c.client_id}?tab=checkin`} style={{
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
                 background: 'var(--surface)', border: '1px solid var(--border-2)', borderRadius: '10px',
-                padding: '16px 20px', textDecoration: 'none',
+                padding: '16px 20px', textDecoration: 'none', gap: '12px',
               }}>
-                <div>
+                <div style={{ minWidth: 0, flex: 1 }}>
                   <p style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text)' }}>{c.clients?.full_name ?? '—'}</p>
                   <p style={{ fontSize: '0.75rem', color: 'var(--text-faint)', marginTop: '2px' }}>Week {c.week_number} · {formatDate(c.checkin_date)}</p>
                   {c.general_notes && (
-                    <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '4px', maxWidth: '500px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {c.general_notes}
                     </p>
                   )}
                 </div>
-                <span style={{ fontSize: '0.75rem', color: '#F97316', flexShrink: 0, marginLeft: '16px' }}>Beantwoorden →</span>
+                <span style={{ fontSize: '0.75rem', color: '#F97316', flexShrink: 0, paddingTop: '2px' }}>Beantwoorden →</span>
               </Link>
             ))}
           </div>
