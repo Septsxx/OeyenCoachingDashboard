@@ -54,23 +54,53 @@ export default async function ClientsPage() {
   const allClients = clients ?? []
 
   return (
-    <div style={{ padding: '32px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px' }}>
+    <div style={{ padding: 'clamp(16px, 4vw, 32px)' }}>
+      <style>{`
+        .clients-header { display: none; }
+        .client-row {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 14px 16px;
+          border-bottom: 1px solid var(--surface-2);
+          text-decoration: none;
+          color: inherit;
+          transition: background 0.1s;
+        }
+        .client-row:hover { background: var(--surface-2); }
+        .client-cell-name { flex: 1; min-width: 0; }
+        .client-cell-name-title { font-size: 0.875rem; font-weight: 500; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .client-cell-name-sub { font-size: 0.72rem; color: var(--text-dim); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .client-cell-intake { font-size: 0.7rem; color: var(--text-faint); margin-top: 1px; }
+        .client-col-email { display: none; }
+        .client-col-package { display: none; }
+        .client-col-action { display: none; }
+        .client-mobile-sub { display: block; }
+        @media (min-width: 768px) {
+          .clients-header { display: grid; grid-template-columns: 1fr 1fr 110px 140px 100px 90px; }
+          .client-row { display: grid; grid-template-columns: 1fr 1fr 110px 140px 100px 90px; align-items: center; padding: 14px 20px; }
+          .client-col-email { display: block; }
+          .client-col-package { display: block; }
+          .client-col-action { display: inline-flex; align-items: center; }
+          .client-mobile-sub { display: none; }
+        }
+      `}</style>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', gap: '12px' }}>
         <div>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '4px' }}>Klanten</h1>
           <p style={{ color: 'var(--text-dim)', fontSize: '0.85rem' }}>{allClients.length} klant{allClients.length !== 1 ? 'en' : ''}</p>
         </div>
         <Link href="/coach/clients/new" style={{
-          background: '#004aad', color: '#ffffff', padding: '10px 20px', borderRadius: '8px',
-          textDecoration: 'none', fontSize: '0.875rem', fontWeight: 600,
+          background: '#004aad', color: '#ffffff', padding: '10px 16px', borderRadius: '8px',
+          textDecoration: 'none', fontSize: '0.875rem', fontWeight: 600, whiteSpace: 'nowrap',
         }}>
           + Nieuwe klant
         </Link>
       </div>
 
       <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden' }}>
-        <div style={{
-          display: 'grid', gridTemplateColumns: '1fr 1fr 110px 140px 100px 90px',
+        <div className="clients-header" style={{
           padding: '12px 20px', borderBottom: '1px solid var(--surface-2)',
           fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.8px',
         }}>
@@ -91,20 +121,20 @@ export default async function ClientsPage() {
             const logs7d = logCount.get(client.id) ?? 0
             const wk = lastCheckin.get(client.id)
             return (
-              <div key={client.id} style={{
-                display: 'grid', gridTemplateColumns: '1fr 1fr 110px 140px 100px 90px',
-                padding: '14px 20px', borderBottom: '1px solid var(--surface-2)', alignItems: 'center',
-              }}>
-                <Link href={`/coach/clients/${client.id}`} style={{ textDecoration: 'none' }}>
-                  <p style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--text)' }}>{client.full_name}</p>
-                  {!client.intake_completed && <p style={{ fontSize: '0.7rem', color: 'var(--text-faint)', marginTop: '1px' }}>Intake niet afgerond</p>}
-                </Link>
-                <span style={{ fontSize: '0.82rem', color: 'var(--text-dim)' }}>{client.email}</span>
-                <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>{packageShortLabel(p?.package)}</span>
+              <Link key={client.id} href={`/coach/clients/${client.id}`} className="client-row">
+                <div className="client-cell-name">
+                  <p className="client-cell-name-title">{client.full_name}</p>
+                  {!client.intake_completed && <p className="client-cell-intake">Intake niet afgerond</p>}
+                  <p className="client-cell-name-sub client-mobile-sub">
+                    {client.email}{p?.package ? ` · ${packageShortLabel(p.package)}` : ''}
+                  </p>
+                </div>
+                <span className="client-col-email" style={{ fontSize: '0.82rem', color: 'var(--text-dim)' }}>{client.email}</span>
+                <span className="client-col-package" style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>{packageShortLabel(p?.package)}</span>
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', fontSize: '0.72rem',
                   padding: '3px 10px', borderRadius: '99px',
-                  background: status.bg, color: status.color, width: 'fit-content',
+                  background: status.bg, color: status.color, width: 'fit-content', whiteSpace: 'nowrap',
                 }}>
                   {status.label}
                 </span>
@@ -114,13 +144,13 @@ export default async function ClientsPage() {
                     <p style={{ fontSize: '0.68rem', color: 'var(--text-faint)', marginTop: '3px' }}>Check-in wk {wk}</p>
                   )}
                 </div>
-                <Link href={`/coach/clients/${client.id}`} style={{
+                <span className="client-col-action" style={{
                   fontSize: '0.75rem', color: 'var(--text)', background: 'var(--surface-2)',
-                  padding: '5px 10px', borderRadius: '6px', textDecoration: 'none', whiteSpace: 'nowrap',
+                  padding: '5px 10px', borderRadius: '6px', whiteSpace: 'nowrap',
                 }}>
                   Bekijken
-                </Link>
-              </div>
+                </span>
+              </Link>
             )
           })
         )}
