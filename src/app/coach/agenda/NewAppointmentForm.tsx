@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Plus, X } from 'lucide-react'
@@ -31,6 +31,14 @@ export default function NewAppointmentForm({ clients }: { clients: Pick<Client, 
   const [loading, setLoading] = useState(false)
   const [calStatus, setCalStatus] = useState<'idle' | 'ok' | 'warn'>('idle')
   const [form, setForm] = useState({ ...EMPTY })
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   function set(key: string, value: string) {
     setForm(f => ({ ...f, [key]: value }))
@@ -114,7 +122,7 @@ export default function NewAppointmentForm({ clients }: { clients: Pick<Client, 
       ) : (
         <form onSubmit={handleSubmit} style={{
           background: 'var(--surface)', border: '1px solid var(--border-2)',
-          borderRadius: '12px', padding: '24px',
+          borderRadius: '12px', padding: isMobile ? '16px' : '24px',
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <p style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text)' }}>Nieuwe afspraak</p>
@@ -124,7 +132,7 @@ export default function NewAppointmentForm({ clients }: { clients: Pick<Client, 
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            <div style={S.grid('1fr 1fr')}>
+            <div style={S.grid(isMobile ? '1fr' : '1fr 1fr')}>
               <div style={S.field}>
                 <label style={S.label}>Klant</label>
                 <select value={form.client_id} onChange={e => set('client_id', e.target.value)}>
@@ -138,7 +146,7 @@ export default function NewAppointmentForm({ clients }: { clients: Pick<Client, 
               </div>
             </div>
 
-            <div style={S.grid('1fr 1fr 1fr 1fr')}>
+            <div style={S.grid(isMobile ? '1fr 1fr' : '1fr 1fr 1fr 1fr')}>
               <div style={S.field}>
                 <label style={S.label}>Datum *</label>
                 <input type="date" value={form.appointment_date} onChange={e => set('appointment_date', e.target.value)} required />
@@ -189,16 +197,18 @@ export default function NewAppointmentForm({ clients }: { clients: Pick<Client, 
             </div>
           )}
 
-          <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '20px' }}>
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '20px', flexDirection: isMobile ? 'column-reverse' : 'row' }}>
             <button type="button" onClick={cancel} style={{
               padding: '9px 18px', borderRadius: '8px', border: '1px solid var(--border-2)',
               background: 'transparent', color: 'var(--text-dim)', fontSize: '0.85rem', cursor: 'pointer',
+              width: isMobile ? '100%' : 'auto',
             }}>
               Annuleren
             </button>
             <button type="submit" disabled={loading} style={{
               padding: '9px 20px', borderRadius: '8px', border: 'none',
               background: '#004aad', color: '#ffffff', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer',
+              width: isMobile ? '100%' : 'auto',
             }}>
               {loading ? 'Opslaan...' : 'Afspraak opslaan'}
             </button>

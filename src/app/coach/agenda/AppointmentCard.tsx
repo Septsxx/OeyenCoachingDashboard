@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Pencil, Trash2, X, Check } from 'lucide-react'
@@ -32,6 +32,7 @@ export default function AppointmentCard({
   const [editing, setEditing] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const [form, setForm] = useState({
     client_id: a.client_id ?? '',
     title: a.title,
@@ -42,6 +43,13 @@ export default function AppointmentCard({
     location: a.location ?? '',
     notes: a.notes ?? '',
   })
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   function set(key: string, value: string) {
     setForm(f => ({ ...f, [key]: value }))
@@ -107,10 +115,10 @@ export default function AppointmentCard({
     return (
       <form onSubmit={handleSave} style={{
         background: 'var(--surface)', border: '1px solid var(--border-2)',
-        borderRadius: '10px', padding: '18px',
+        borderRadius: '10px', padding: isMobile ? '14px' : '18px',
       }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '12px' }}>
             <div>
               <label style={S.label}>Klant</label>
               <select value={form.client_id} onChange={e => set('client_id', e.target.value)}>
@@ -124,7 +132,7 @@ export default function AppointmentCard({
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : '1fr 1fr 1fr 1fr', gap: '12px' }}>
             <div>
               <label style={S.label}>Datum *</label>
               <input type="date" value={form.appointment_date} onChange={e => set('appointment_date', e.target.value)} required />
@@ -159,19 +167,20 @@ export default function AppointmentCard({
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '14px' }}>
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '14px', flexDirection: isMobile ? 'column-reverse' : 'row' }}>
           <button type="button" onClick={() => setEditing(false)} style={{
-            display: 'flex', alignItems: 'center', gap: '6px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
             padding: '8px 14px', borderRadius: '8px', border: '1px solid var(--border-2)',
             background: 'transparent', color: 'var(--text-dim)', fontSize: '0.82rem', cursor: 'pointer',
+            width: isMobile ? '100%' : 'auto',
           }}>
             <X size={13} /> Annuleren
           </button>
           <button type="submit" disabled={loading} style={{
-            display: 'flex', alignItems: 'center', gap: '6px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
             padding: '8px 16px', borderRadius: '8px', border: 'none',
             background: '#004aad', color: '#ffffff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer',
-            opacity: loading ? 0.6 : 1,
+            opacity: loading ? 0.6 : 1, width: isMobile ? '100%' : 'auto',
           }}>
             <Check size={13} /> {loading ? 'Opslaan...' : 'Wijzigingen opslaan'}
           </button>
@@ -182,9 +191,9 @@ export default function AppointmentCard({
 
   return (
     <div style={{
-      display: 'flex', alignItems: 'center', gap: '16px',
+      display: 'flex', alignItems: 'center', gap: isMobile ? '10px' : '16px',
       background: 'var(--surface)', border: '1px solid var(--border)',
-      borderRadius: '10px', padding: '14px 18px',
+      borderRadius: '10px', padding: isMobile ? '12px 14px' : '14px 18px',
       opacity: dim ? 0.6 : 1,
     }}>
       {/* Time */}
@@ -235,7 +244,7 @@ export default function AppointmentCard({
         </button>
         {deleting ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>Verwijderen?</span>
+            {!isMobile && <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>Verwijderen?</span>}
             <button
               onClick={handleDelete}
               style={{ background: '#EF4444', border: 'none', cursor: 'pointer', color: '#fff', padding: '4px 8px', borderRadius: '6px', fontSize: '0.72rem', fontWeight: 600 }}

@@ -49,7 +49,7 @@ export default async function AgendaPage() {
   const pastByDate = groupByDate([...past].reverse())
 
   return (
-    <div style={{ padding: '32px', maxWidth: '860px' }}>
+    <div className="page-pad" style={{ maxWidth: '860px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px' }}>
         <div>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '4px' }}>Agenda</h1>

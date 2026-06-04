@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, isToday, parseISO } from 'date-fns'
 import { nl } from 'date-fns/locale'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
@@ -41,6 +41,14 @@ export default function CalendarView({
 }) {
   const [current, setCurrent] = useState(() => new Date())
   const [selected, setSelected] = useState<string | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   const monthStart = startOfMonth(current)
   const days = eachDayOfInterval({ start: monthStart, end: endOfMonth(current) })
@@ -60,7 +68,7 @@ export default function CalendarView({
       background: 'var(--surface)',
       border: '1px solid var(--border)',
       borderRadius: '14px',
-      padding: '22px',
+      padding: isMobile ? '14px' : '22px',
       marginBottom: '36px',
     }}>
       {/* Month navigation */}
@@ -102,8 +110,8 @@ export default function CalendarView({
               onClick={() => setSelected(isSelected ? null : dateStr)}
               style={{
                 borderRadius: '8px',
-                padding: '6px 2px 8px',
-                minHeight: '56px',
+                padding: isMobile ? '4px 1px 6px' : '6px 2px 8px',
+                minHeight: isMobile ? '40px' : '56px',
                 border: isSelected
                   ? '1.5px solid var(--text)'
                   : today
@@ -124,7 +132,7 @@ export default function CalendarView({
               }}
             >
               <span style={{
-                fontSize: '0.78rem',
+                fontSize: isMobile ? '0.7rem' : '0.78rem',
                 fontWeight: today ? 700 : 400,
                 color: today ? '#004aad' : 'var(--text-dim)',
                 lineHeight: 1,
@@ -155,7 +163,7 @@ export default function CalendarView({
       </div>
 
       {/* Legend */}
-      <div style={{ display: 'flex', gap: '14px', marginTop: '16px', paddingTop: '14px', borderTop: '1px solid var(--border)' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px 14px', marginTop: '16px', paddingTop: '14px', borderTop: '1px solid var(--border)' }}>
         {Object.entries(TYPE_COLOR).map(([type, color]) => (
           <div key={type} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
             <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: color }} />
