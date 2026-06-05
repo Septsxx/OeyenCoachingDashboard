@@ -4,13 +4,12 @@ import { createClient } from '@/lib/supabase/client'
 import { ProgressBar } from '@/components/base/progress-indicators/progress-indicators'
 
 const S = {
-  page: { minHeight: '100vh', background: '#F5F5F3', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', padding: '48px 16px' },
+  page: { minHeight: '100vh', background: '#F5F5F3', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', padding: '32px 16px' },
   card: { width: '100%', maxWidth: '640px' },
-  logo: { marginBottom: '40px', textAlign: 'center' as const },
-  section: { background: '#FFFFFF', border: '1px solid #E5E5E3', borderRadius: '12px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' },
+  logo: { marginBottom: '32px', textAlign: 'center' as const },
+  section: { background: '#FFFFFF', border: '1px solid #E5E5E3', borderRadius: '12px', padding: '20px', marginBottom: '16px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' },
   sectionTitle: { fontSize: '0.7rem', fontWeight: 700, color: '#999', textTransform: 'uppercase' as const, letterSpacing: '1.5px', marginBottom: '16px' },
-  grid2: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' },
-  field: { marginBottom: '16px' },
+  field: { marginBottom: '14px' },
   label: { display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#555', textTransform: 'uppercase' as const, letterSpacing: '0.6px', marginBottom: '6px' },
 }
 
@@ -111,7 +110,7 @@ export default function IntakePage() {
         <p style={{ color: '#888', fontSize: '0.85rem', marginBottom: '24px', textAlign: 'center', lineHeight: 1.6 }}>
           Vul dit formulier zo volledig mogelijk in. Alle info blijft strikt vertrouwelijk.
         </p>
-        <div style={{ position: 'sticky', top: 0, zIndex: 10, background: '#F5F5F3', padding: '12px 0', marginBottom: '20px' }}>
+        <div style={{ position: 'sticky', top: 0, zIndex: 10, background: '#F5F5F3', padding: '10px 0', marginBottom: '16px' }}>
           <ProgressBar min={0} max={TRACKED_FIELDS.length} value={filledCount} label="Voortgang" />
         </div>
 
@@ -129,7 +128,7 @@ export default function IntakePage() {
           {/* Persoonlijke info */}
           <div style={S.section}>
             <p style={S.sectionTitle}>Persoonlijke informatie</p>
-            <div style={S.grid2}>
+            <div className="cols-2">
               <div style={S.field}>
                 <label style={S.label}>Volledige naam *</label>
                 <input value={form.full_name} onChange={e => set('full_name', e.target.value)} required placeholder="Jan Janssen" />
@@ -154,7 +153,7 @@ export default function IntakePage() {
                   <option value="vrouw">Vrouw</option>
                 </select>
               </div>
-              <div style={{ ...S.grid2, gridTemplateColumns: '1fr 1fr' }}>
+              <div className="cols-2">
                 <div style={S.field}>
                   <label style={S.label}>Lengte (cm)</label>
                   <input type="number" value={form.height_cm} onChange={e => set('height_cm', e.target.value)} placeholder="175" />
@@ -223,7 +222,7 @@ export default function IntakePage() {
               <label style={S.label}>Huidig eetpatroon / dieet</label>
               <textarea value={form.current_diet} onChange={e => set('current_diet', e.target.value)} rows={2} placeholder="Bv. geen restricties, vegetarisch..." />
             </div>
-            <div style={S.grid2}>
+            <div className="cols-2">
               <div style={S.field}>
                 <label style={S.label}>Aantal maaltijden/dag</label>
                 <input type="number" min={1} max={8} value={form.meal_frequency} onChange={e => set('meal_frequency', e.target.value)} placeholder="3" />
@@ -256,7 +255,7 @@ export default function IntakePage() {
           {/* Training */}
           <div style={S.section}>
             <p style={S.sectionTitle}>Training</p>
-            <div style={S.grid2}>
+            <div className="cols-2">
               <div style={S.field}>
                 <label style={S.label}>Activiteitsniveau</label>
                 <select value={form.activity_level} onChange={e => set('activity_level', e.target.value)}>
