@@ -37,7 +37,7 @@ function FoodForm({
   return (
     <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '20px', marginBottom: '16px' }}>
       <p style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: '16px' }}>{title}</p>
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+      <div className="food-form-top">
         <div>
           <label style={LABEL}>Naam *</label>
           <input value={form.name} onChange={e => onChange('name', e.target.value)} placeholder="Bijv. Kipfilet" />
@@ -59,7 +59,7 @@ function FoodForm({
       <p style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>
         Macro's per 100g
       </p>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '10px', marginBottom: '12px' }}>
+      <div className="food-macro-grid">
         {[
           ['calories_per_100g', 'Kcal'],
           ['protein_per_100g', 'Eiwitten (g)'],
@@ -324,7 +324,7 @@ export default function FoodManager({ initialFoods }: { initialFoods: Food[] }) 
       ) : (
         <div style={{ border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden' }}>
           {/* Header row */}
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 80px 70px 70px 70px 60px 80px', gap: '12px', padding: '10px 16px', background: 'var(--surface-2)', fontSize: '0.68rem', fontWeight: 600, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+          <div className="food-table-header">
             <span>Naam</span>
             <span>Categorie</span>
             <span style={{ textAlign: 'right' }}>Kcal</span>
@@ -348,30 +348,25 @@ export default function FoodManager({ initialFoods }: { initialFoods: Food[] }) 
                 />
               </div>
             ) : (
-              <div key={food.id} style={{
-                display: 'grid',
-                gridTemplateColumns: '2fr 1fr 80px 70px 70px 70px 60px 80px',
-                gap: '12px',
-                padding: '12px 16px',
-                borderTop: i > 0 ? '1px solid var(--border)' : 'none',
-                alignItems: 'center',
-                fontSize: '0.83rem',
-              }}>
-                <div>
+              <div key={food.id} className="food-table-row" style={{ borderTop: i > 0 ? '1px solid var(--border)' : 'none' }}>
+                <div className="food-col-name">
                   <span style={{ fontWeight: 500 }}>{food.name}</span>
                   {food.brand && <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)', marginLeft: '6px' }}>{food.brand}</span>}
                 </div>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+                <span className="food-desktop-only" style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
                   {food.category ? FOOD_CATEGORIES[food.category] : '—'}
                 </span>
-                <span style={{ textAlign: 'right', fontWeight: 600 }}>{food.calories_per_100g}</span>
-                <span style={{ textAlign: 'right', color: '#004aad' }}>{food.protein_per_100g}</span>
-                <span style={{ textAlign: 'right', color: '#F59E0B' }}>{food.carbs_per_100g}</span>
-                <span style={{ textAlign: 'right', color: '#EF4444' }}>{food.fat_per_100g}</span>
-                <span style={{ textAlign: 'right', color: 'var(--text-dim)', fontSize: '0.75rem' }}>
+                <span className="food-desktop-only" style={{ textAlign: 'right', fontWeight: 600 }}>{food.calories_per_100g}</span>
+                <span className="food-desktop-only" style={{ textAlign: 'right', color: '#004aad' }}>{food.protein_per_100g}</span>
+                <span className="food-desktop-only" style={{ textAlign: 'right', color: '#F59E0B' }}>{food.carbs_per_100g}</span>
+                <span className="food-desktop-only" style={{ textAlign: 'right', color: '#EF4444' }}>{food.fat_per_100g}</span>
+                <span className="food-desktop-only" style={{ textAlign: 'right', color: 'var(--text-dim)', fontSize: '0.75rem' }}>
                   {food.serving_size_g ?? 100}{food.unit}
                 </span>
-                <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                <div className="food-mobile-summary">
+                  {food.category ? FOOD_CATEGORIES[food.category] : '—'} · {food.calories_per_100g} kcal · E {food.protein_per_100g}g · KH {food.carbs_per_100g}g · V {food.fat_per_100g}g
+                </div>
+                <div className="food-col-actions" style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
                   {deletingId === food.id ? (
                     <>
                       <button onClick={() => handleDelete(food.id)} style={{ ...BTN_GHOST, padding: '4px 8px', fontSize: '0.72rem', color: '#EF4444', borderColor: '#EF4444' }}>

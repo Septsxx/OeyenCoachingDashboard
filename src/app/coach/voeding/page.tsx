@@ -18,7 +18,7 @@ export default async function VoedingPage() {
     .order('name', { ascending: true }) as { data: Food[] | null }
 
   return (
-    <div style={{ padding: '32px', maxWidth: '1100px' }}>
+    <div className="page-pad" style={{ maxWidth: '1100px' }}>
       <div style={{ marginBottom: '32px' }}>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '4px' }}>Voedingsdatabase</h1>
         <p style={{ color: 'var(--text-dim)', fontSize: '0.85rem' }}>

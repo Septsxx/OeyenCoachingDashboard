@@ -132,29 +132,59 @@ export default function AppointmentCard({
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : '1fr 1fr 1fr 1fr', gap: '12px' }}>
-            <div>
-              <label style={S.label}>Datum *</label>
-              <input type="date" value={form.appointment_date} onChange={e => set('appointment_date', e.target.value)} required />
+          {isMobile ? (
+            <>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={S.label}>Datum *</label>
+                  <input type="date" value={form.appointment_date} onChange={e => set('appointment_date', e.target.value)} required />
+                </div>
+                <div>
+                  <label style={S.label}>Tijdstip</label>
+                  <input type="time" value={form.appointment_time} onChange={e => set('appointment_time', e.target.value)} />
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={S.label}>Duur (min)</label>
+                  <input type="number" min={5} step={5} value={form.duration_minutes} onChange={e => set('duration_minutes', e.target.value)} placeholder="60" />
+                </div>
+                <div>
+                  <label style={S.label}>Type</label>
+                  <select value={form.type} onChange={e => set('type', e.target.value)}>
+                    <option value="coaching">Coaching</option>
+                    <option value="intake">Intake</option>
+                    <option value="checkin">Check-in</option>
+                    <option value="other">Overig</option>
+                  </select>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '12px' }}>
+              <div>
+                <label style={S.label}>Datum *</label>
+                <input type="date" value={form.appointment_date} onChange={e => set('appointment_date', e.target.value)} required />
+              </div>
+              <div>
+                <label style={S.label}>Tijdstip</label>
+                <input type="time" value={form.appointment_time} onChange={e => set('appointment_time', e.target.value)} />
+              </div>
+              <div>
+                <label style={S.label}>Duur (min)</label>
+                <input type="number" min={5} step={5} value={form.duration_minutes} onChange={e => set('duration_minutes', e.target.value)} placeholder="60" />
+              </div>
+              <div>
+                <label style={S.label}>Type</label>
+                <select value={form.type} onChange={e => set('type', e.target.value)}>
+                  <option value="coaching">Coaching</option>
+                  <option value="intake">Intake</option>
+                  <option value="checkin">Check-in</option>
+                  <option value="other">Overig</option>
+                </select>
+              </div>
             </div>
-            <div>
-              <label style={S.label}>Tijdstip</label>
-              <input type="time" value={form.appointment_time} onChange={e => set('appointment_time', e.target.value)} />
-            </div>
-            <div>
-              <label style={S.label}>Duur (min)</label>
-              <input type="number" min={5} step={5} value={form.duration_minutes} onChange={e => set('duration_minutes', e.target.value)} placeholder="60" />
-            </div>
-            <div>
-              <label style={S.label}>Type</label>
-              <select value={form.type} onChange={e => set('type', e.target.value)}>
-                <option value="coaching">Coaching</option>
-                <option value="intake">Intake</option>
-                <option value="checkin">Check-in</option>
-                <option value="other">Overig</option>
-              </select>
-            </div>
-          </div>
+          )}
 
           <div>
             <label style={S.label}>Locatie</label>
