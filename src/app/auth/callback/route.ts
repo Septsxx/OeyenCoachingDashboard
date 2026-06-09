@@ -14,7 +14,10 @@ export async function GET(request: Request) {
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+      const destination = next === '/update-password'
+        ? `${origin}/update-password?welkom=1`
+        : `${origin}${next}`
+      return NextResponse.redirect(destination)
     }
   }
 

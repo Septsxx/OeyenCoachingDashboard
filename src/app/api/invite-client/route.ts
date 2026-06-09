@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:7778'
   const { data, error } = await admin.auth.admin.inviteUserByEmail(email, {
-    redirectTo: `${siteUrl}/auth/callback?next=/client`,
+    redirectTo: `${siteUrl}/auth/callback?next=/update-password`,
   })
 
   if (error) {

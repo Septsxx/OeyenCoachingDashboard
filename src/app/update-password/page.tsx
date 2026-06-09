@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 export default function UpdatePasswordPage() {
@@ -10,6 +11,8 @@ export default function UpdatePasswordPage() {
   const [done, setDone] = useState(false)
   const [error, setError] = useState('')
   const [sessionReady, setSessionReady] = useState(false)
+  const searchParams = useSearchParams()
+  const isNewAccount = searchParams.get('welkom') === '1'
   const supabase = createClient()
 
   useEffect(() => {
@@ -58,7 +61,7 @@ export default function UpdatePasswordPage() {
       setError(error.message)
     } else {
       setDone(true)
-      setTimeout(() => { window.location.href = '/login' }, 2500)
+      setTimeout(() => { window.location.href = '/client' }, 2500)
     }
   }
 
@@ -108,15 +111,19 @@ export default function UpdatePasswordPage() {
           padding: '36px',
         }}>
           <h1 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '8px', color: '#FFF' }}>
-            Nieuw wachtwoord instellen
+            {isNewAccount ? 'Welkom! Stel je wachtwoord in' : 'Nieuw wachtwoord instellen'}
           </h1>
           <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '28px' }}>
-            Kies een sterk wachtwoord van minstens 8 tekens.
+            {isNewAccount
+              ? 'Kies een wachtwoord om toegang te krijgen tot je coaching portaal.'
+              : 'Kies een sterk wachtwoord van minstens 8 tekens.'}
           </p>
 
           {done ? (
             <div style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: '8px', padding: '14px', fontSize: '0.85rem', color: '#22C55E' }}>
-              Wachtwoord succesvol gewijzigd! Je wordt doorgestuurd naar de loginpagina...
+              {isNewAccount
+                ? 'Account klaar! Je wordt doorgestuurd naar je portaal...'
+                : 'Wachtwoord succesvol gewijzigd! Je wordt doorgestuurd...'}
             </div>
           ) : (
             <form onSubmit={handleUpdate}>
