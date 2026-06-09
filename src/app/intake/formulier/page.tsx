@@ -79,7 +79,7 @@ export default function IntakePage() {
 
     // Auto-create login account and send invite email
     if (inserted?.id) {
-      await fetch('/api/invite-client', {
+      await fetch('/api/intake-invite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: form.email, clientId: inserted.id }),
