@@ -79,11 +79,17 @@ export default function IntakePage() {
 
     // Auto-create login account and send invite email
     if (inserted?.id) {
-      await fetch('/api/intake-invite', {
+      const inviteRes = await fetch('/api/intake-invite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: form.email, clientId: inserted.id }),
       })
+      if (!inviteRes.ok) {
+        const { error: inviteErr } = await inviteRes.json().catch(() => ({ error: 'Onbekende fout' }))
+        setError(`Intake opgeslagen, maar uitnodigingsmail kon niet verstuurd worden: ${inviteErr}`)
+        setLoading(false)
+        return
+      }
     }
 
     setStep('done')
