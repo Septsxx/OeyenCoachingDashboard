@@ -70,7 +70,12 @@ export default function IntakePage() {
       training_experience: form.training_experience || null,
       intake_completed: true,
     }).select('id').single()
-    if (error) { setError(error.message); setLoading(false); return }
+    if (error) {
+      const msg = error.message.includes('clients_email_key')
+        ? 'Dit e-mailadres is al geregistreerd. Neem contact op met je coach als je een probleem hebt met je account.'
+        : error.message
+      setError(msg); setLoading(false); return
+    }
 
     // Auto-create login account and send invite email
     if (inserted?.id) {
