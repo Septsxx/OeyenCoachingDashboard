@@ -72,9 +72,16 @@ export default async function MaaltijdplanPage() {
 
       <h1 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: '4px' }}>{plan.name}</h1>
       {plan.water_target && (
-        <p style={{ color: 'var(--text-dim)', fontSize: '0.85rem', marginBottom: '24px' }}>Waterdoelstelling: {plan.water_target}</p>
+        <p style={{ color: 'var(--text-dim)', fontSize: '0.85rem', marginBottom: '16px' }}>Waterdoelstelling: {plan.water_target}</p>
       )}
-      {!plan.water_target && <div style={{ marginBottom: '24px' }} />}
+      {!plan.water_target && <div style={{ marginBottom: '16px' }} />}
+
+      <div style={{ background: 'rgba(249,115,22,0.08)', border: '1px solid rgba(249,115,22,0.3)', borderRadius: '10px', padding: '12px 16px', marginBottom: '24px', display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+        <span style={{ fontSize: '1rem', flexShrink: 0, marginTop: '1px' }}>⚠️</span>
+        <p style={{ fontSize: '0.83rem', color: 'var(--text-muted)', lineHeight: 1.55, margin: 0 }}>
+          <strong style={{ color: 'var(--text)' }}>Alle gewichten zijn ONGEKOOKT.</strong> Weeg al je voedingsmiddelen altijd af vóór het koken of bereiden.
+        </p>
+      </div>
 
       {plan.notes && (
         <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '16px 20px', marginBottom: '28px' }}>
