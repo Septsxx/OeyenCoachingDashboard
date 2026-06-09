@@ -109,7 +109,7 @@ export default function IntakePage() {
             }}>✓</div>
             <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#111', marginBottom: '10px' }}>Welkom bij Oeyen Coaching!</h1>
             <p style={{ color: '#777', fontSize: '0.88rem', lineHeight: 1.7, maxWidth: '420px', margin: '0 auto' }}>
-              Je intake is ontvangen. Check je inbox — je ontvangt zo meteen een e-mail om je account in te stellen.
+              Je intake is ontvangen. Check je inbox, je ontvangt zo meteen een e-mail om je account in te stellen.
             </p>
           </div>
 
