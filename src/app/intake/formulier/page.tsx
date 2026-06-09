@@ -92,12 +92,76 @@ export default function IntakePage() {
   if (step === 'done') {
     return (
       <div style={S.page} data-theme="light">
-        <div style={{ ...S.card, textAlign: 'center', paddingTop: '80px' }}>
-          <div style={{ fontSize: '2rem', marginBottom: '16px' }}>✓</div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '12px', color: '#111' }}>Intake ontvangen!</h1>
-          <p style={{ color: '#777', fontSize: '0.9rem', lineHeight: 1.6 }}>
-            Bedankt voor het invullen van de intake. Je ontvangt zo meteen een e-mail met een link om je account in te stellen en in te loggen op het clientportaal.
+        <div style={S.card}>
+
+          {/* Logo */}
+          <div style={S.logo}>
+            <div style={{ fontSize: '1.1rem', fontWeight: 800, letterSpacing: '3px', color: '#111' }}>OEYEN</div>
+            <div style={{ fontSize: '0.55rem', letterSpacing: '5px', color: '#999', marginTop: '2px' }}>COACHING</div>
+          </div>
+
+          {/* Success badge */}
+          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              width: '64px', height: '64px', borderRadius: '50%',
+              background: '#111', color: '#fff', fontSize: '1.6rem', marginBottom: '20px',
+            }}>✓</div>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#111', marginBottom: '10px' }}>Welkom bij Oeyen Coaching!</h1>
+            <p style={{ color: '#777', fontSize: '0.88rem', lineHeight: 1.7, maxWidth: '420px', margin: '0 auto' }}>
+              Je intake is ontvangen. Check je inbox — je ontvangt zo meteen een e-mail om je account in te stellen.
+            </p>
+          </div>
+
+          {/* Wat nu? */}
+          <div style={{ background: '#fff', border: '1px solid #E5E5E3', borderRadius: '12px', padding: '24px', marginBottom: '16px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+            <p style={{ fontSize: '0.68rem', fontWeight: 700, color: '#999', textTransform: 'uppercase' as const, letterSpacing: '1.5px', marginBottom: '18px' }}>Wat nu?</p>
+            {[
+              { step: '1', title: 'Check je e-mail', desc: 'Je ontvangt een uitnodigingsmail om je wachtwoord in te stellen.' },
+              { step: '2', title: 'Stel je wachtwoord in', desc: 'Klik op de link in de mail en kies een wachtwoord voor je account.' },
+              { step: '3', title: 'Jouw portaal is klaar', desc: 'Bekijk je schema\'s, log je dagelijkse voortgang en check in bij je coach.' },
+            ].map(({ step, title, desc }) => (
+              <div key={step} style={{ display: 'flex', gap: '16px', marginBottom: '18px', alignItems: 'flex-start' }}>
+                <div style={{
+                  flexShrink: 0, width: '28px', height: '28px', borderRadius: '50%',
+                  background: '#F5F5F3', border: '1px solid #E5E5E3',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '0.72rem', fontWeight: 700, color: '#111',
+                }}>{step}</div>
+                <div>
+                  <p style={{ fontSize: '0.85rem', fontWeight: 700, color: '#111', margin: '0 0 3px' }}>{title}</p>
+                  <p style={{ fontSize: '0.8rem', color: '#888', margin: 0, lineHeight: 1.5 }}>{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Wat zit er in het portaal */}
+          <div style={{ background: '#fff', border: '1px solid #E5E5E3', borderRadius: '12px', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+            <p style={{ fontSize: '0.68rem', fontWeight: 700, color: '#999', textTransform: 'uppercase' as const, letterSpacing: '1.5px', marginBottom: '16px' }}>Wat vind je in je portaal?</p>
+            <div className="cols-2" style={{ gap: '10px' }}>
+              {[
+                { icon: '📋', label: 'Voedingsschema' },
+                { icon: '🏋️', label: 'Trainingsschema' },
+                { icon: '📊', label: 'Dagelijkse logs' },
+                { icon: '📈', label: 'Voortgang & metingen' },
+              ].map(({ icon, label }) => (
+                <div key={label} style={{
+                  background: '#F5F5F3', borderRadius: '10px', padding: '14px 16px',
+                  display: 'flex', alignItems: 'center', gap: '10px',
+                }}>
+                  <span style={{ fontSize: '1.1rem' }}>{icon}</span>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#333' }}>{label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <p style={{ textAlign: 'center', fontSize: '0.75rem', color: '#bbb', marginTop: '28px', marginBottom: '8px' }}>
+            Vragen? Contacteer Dimitri via{' '}
+            <a href="mailto:info@oeyen-coaching.be" style={{ color: '#999', textDecoration: 'none' }}>info@oeyen-coaching.be</a>
           </p>
+
         </div>
       </div>
     )
