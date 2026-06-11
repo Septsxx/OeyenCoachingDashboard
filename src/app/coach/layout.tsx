@@ -119,7 +119,7 @@ export default function CoachLayout({ children }: { children: React.ReactNode })
           <img
             src="/img/oeyen-coaching.png"
             alt="Oeyen Coaching"
-            style={{ height: '60px', width: 'auto', filter: theme === 'dark' ? 'brightness(0) invert(1)' : 'brightness(0)', mixBlendMode: theme === 'dark' ? 'screen' : 'multiply' }}
+            style={{ height: '80px', width: 'auto', filter: theme === 'dark' ? 'brightness(0) invert(1)' : 'brightness(0)', mixBlendMode: theme === 'dark' ? 'screen' : 'multiply' }}
           />
           {isMobile && (
             <button
