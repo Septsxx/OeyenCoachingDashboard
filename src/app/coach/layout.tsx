@@ -72,7 +72,7 @@ export default function CoachLayout({ children }: { children: React.ReactNode })
           <img
             src="/img/Oeyen-Coaching-Logo-Coach.png"
             alt="Oeyen Coaching"
-            style={{ height: '38px', width: 'auto', filter: theme === 'dark' ? 'brightness(0) invert(1)' : 'brightness(0)', mixBlendMode: theme === 'dark' ? 'screen' : 'multiply' }}
+            style={{ height: '38px', width: 'auto', borderRadius: '4px' }}
           />
           <button
             onClick={() => setSidebarOpen(o => !o)}
@@ -119,7 +119,7 @@ export default function CoachLayout({ children }: { children: React.ReactNode })
           <img
             src="/img/Oeyen-Coaching-Logo-Coach.png"
             alt="Oeyen Coaching"
-            style={{ width: '100%', height: 'auto', filter: theme === 'dark' ? 'brightness(0) invert(1)' : 'brightness(0)', mixBlendMode: theme === 'dark' ? 'screen' : 'multiply' }}
+            style={{ width: '100%', height: 'auto', borderRadius: '8px' }}
           />
           {isMobile && (
             <button
