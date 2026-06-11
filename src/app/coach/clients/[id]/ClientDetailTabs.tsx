@@ -1,5 +1,6 @@
 'use client'
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip,
   ResponsiveContainer, CartesianGrid
@@ -64,6 +65,73 @@ function InlineTextCell({ value, onSave, placeholder }: {
     <button onClick={() => { setInput(value ?? ''); setEditing(true) }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px 4px', color: value ? 'var(--text)' : 'var(--text-faint)', fontSize: '0.78rem', textAlign: 'left', width: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '200px' }}>
       {value || placeholder || '—'}
     </button>
+  )
+}
+
+function AccountSection({ client }: { client: Client }) {
+  const [email, setEmail] = useState(client.email ?? '')
+  const [password, setPassword] = useState('')
+  const [showPw, setShowPw] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [done, setDone] = useState(false)
+  const router = useRouter()
+
+  async function handleCreate(e: React.FormEvent) {
+    e.preventDefault()
+    setLoading(true); setError('')
+    const res = await fetch('/api/coach/clients/create-account', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId: client.id, email, password }),
+    })
+    const json = await res.json()
+    setLoading(false)
+    if (!res.ok) { setError(json.error ?? 'Onbekende fout'); return }
+    setDone(true)
+    router.refresh()
+  }
+
+  return (
+    <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '20px', marginBottom: '20px' }}>
+      <p style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '1.2px', marginBottom: '14px' }}>Portaal account</p>
+
+      {client.user_id ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#22C55E', flexShrink: 0 }} />
+          <span style={{ fontSize: '0.85rem', color: 'var(--text)' }}>Account actief</span>
+          <span style={{ fontSize: '0.82rem', color: 'var(--text-dim)' }}>— {client.email}</span>
+        </div>
+      ) : done ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#22C55E', flexShrink: 0 }} />
+          <span style={{ fontSize: '0.85rem', color: '#22C55E' }}>Account aangemaakt voor {email}</span>
+        </div>
+      ) : (
+        <form onSubmit={handleCreate}>
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-dim)', marginBottom: '16px' }}>
+            Nog geen account. Stel een e-mailadres en wachtwoord in voor de klant.
+          </p>
+          <div className="cols-2" style={{ marginBottom: '12px' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '5px' }}>E-mailadres</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="klant@email.com" />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '5px' }}>Wachtwoord</label>
+              <div style={{ position: 'relative' }}>
+                <input type={showPw ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} required minLength={8} placeholder="Min. 8 tekens" style={{ paddingRight: '40px' }} />
+                <button type="button" onClick={() => setShowPw(v => !v)} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-dim)', fontSize: '0.8rem' }}>{showPw ? '🙈' : '👁'}</button>
+              </div>
+            </div>
+          </div>
+          {error && <p style={{ fontSize: '0.8rem', color: 'var(--danger)', marginBottom: '10px' }}>{error}</p>}
+          <button type="submit" disabled={loading} style={{ background: '#111', color: '#fff', border: 'none', borderRadius: '8px', padding: '9px 20px', fontSize: '0.82rem', fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1 }}>
+            {loading ? 'Aanmaken...' : 'Account aanmaken'}
+          </button>
+        </form>
+      )}
+    </div>
   )
 }
 
@@ -862,6 +930,10 @@ export default function ClientDetailTabs({
               Profiel bewerken
             </button>
           </div>
+
+          {/* Account sectie */}
+          <AccountSection client={client} />
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
           {[
             ['Naam', client.full_name],
