@@ -100,7 +100,7 @@ export default function IntakePage() {
             }}>✓</div>
             <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#111', marginBottom: '10px' }}>Welkom bij Oeyen Coaching!</h1>
             <p style={{ color: '#777', fontSize: '0.88rem', lineHeight: 1.7, maxWidth: '420px', margin: '0 auto' }}>
-              Je intake is ontvangen. Check je inbox, je ontvangt zo meteen een e-mail om je account in te stellen.
+              Je intake is ontvangen. Dimitri neemt binnenkort contact met je op om je toegang tot het portaal in te stellen.
             </p>
           </div>
 
@@ -108,8 +108,8 @@ export default function IntakePage() {
           <div style={{ background: '#fff', border: '1px solid #E5E5E3', borderRadius: '12px', padding: '24px', marginBottom: '16px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
             <p style={{ fontSize: '0.68rem', fontWeight: 700, color: '#999', textTransform: 'uppercase' as const, letterSpacing: '1.5px', marginBottom: '18px' }}>Wat nu?</p>
             {[
-              { step: '1', title: 'Check je e-mail', desc: 'Je ontvangt een uitnodigingsmail om je wachtwoord in te stellen.' },
-              { step: '2', title: 'Stel je wachtwoord in', desc: 'Klik op de link in de mail en kies een wachtwoord voor je account.' },
+              { step: '1', title: 'Intake ontvangen', desc: 'Dimitri bekijkt je intake en stelt je persoonlijk programma op.' },
+              { step: '2', title: 'Account instellen', desc: 'Je ontvangt van Dimitri je inloggegevens voor het portaal.' },
               { step: '3', title: 'Jouw portaal is klaar', desc: 'Bekijk je schema\'s, log je dagelijkse voortgang en check in bij je coach.' },
             ].map(({ step, title, desc }) => (
               <div key={step} style={{ display: 'flex', gap: '16px', marginBottom: '18px', alignItems: 'flex-start' }}>
