@@ -70,7 +70,7 @@ export default function CoachLayout({ children }: { children: React.ReactNode })
           padding: '0 16px', zIndex: 30,
         }}>
           <img
-            src="/img/oeyen-coaching.png"
+            src="/img/Oeyen-Coaching-Logo-Coach.png"
             alt="Oeyen Coaching"
             style={{ height: '38px', width: 'auto', filter: theme === 'dark' ? 'brightness(0) invert(1)' : 'brightness(0)', mixBlendMode: theme === 'dark' ? 'screen' : 'multiply' }}
           />
@@ -117,7 +117,7 @@ export default function CoachLayout({ children }: { children: React.ReactNode })
         {/* Logo */}
         <div style={{ padding: '20px 20px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <img
-            src="/img/oeyen-coaching.png"
+            src="/img/Oeyen-Coaching-Logo-Coach.png"
             alt="Oeyen Coaching"
             style={{ width: '100%', height: 'auto', filter: theme === 'dark' ? 'brightness(0) invert(1)' : 'brightness(0)', mixBlendMode: theme === 'dark' ? 'screen' : 'multiply' }}
           />
