@@ -1,6 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip,
   ResponsiveContainer, CartesianGrid
@@ -131,6 +132,82 @@ function AccountSection({ client }: { client: Client }) {
           </button>
         </form>
       )}
+    </div>
+  )
+}
+
+function BillingSection({ client }: { client: Client }) {
+  const supabase = createClient()
+  const router = useRouter()
+  const [form, setForm] = useState({
+    company_name: client.company_name ?? '',
+    tav: client.tav ?? '',
+    vat_number: client.vat_number ?? '',
+    billing_address: client.billing_address ?? '',
+    billing_phone: client.billing_phone ?? '',
+  })
+  const [loading, setLoading] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [error, setError] = useState('')
+
+  function set(key: string, value: string) {
+    setForm(f => ({ ...f, [key]: value }))
+    setSaved(false)
+  }
+
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault()
+    setLoading(true); setError('')
+    const { error: dbErr } = await supabase.from('clients').update({
+      company_name: form.company_name.trim() || null,
+      tav: form.tav.trim() || null,
+      vat_number: form.vat_number.trim() || null,
+      billing_address: form.billing_address.trim() || null,
+      billing_phone: form.billing_phone.trim() || null,
+      updated_at: new Date().toISOString(),
+    }).eq('id', client.id)
+    setLoading(false)
+    if (dbErr) { setError('Opslaan mislukt.'); return }
+    setSaved(true)
+    router.refresh()
+  }
+
+  const labelStyle: React.CSSProperties = { display: 'block', fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '5px' }
+
+  return (
+    <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '20px', marginBottom: '20px' }}>
+      <p style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '1.2px', marginBottom: '16px' }}>Factuurgegevens</p>
+      <form onSubmit={handleSave}>
+        <div className="cols-2" style={{ marginBottom: '12px' }}>
+          <div>
+            <label style={labelStyle}>Bedrijfsnaam</label>
+            <input value={form.company_name} onChange={e => set('company_name', e.target.value)} placeholder="bv. Acme BV" />
+          </div>
+          <div>
+            <label style={labelStyle}>T.A.V.</label>
+            <input value={form.tav} onChange={e => set('tav', e.target.value)} placeholder="bv. Jan Janssen" />
+          </div>
+          <div>
+            <label style={labelStyle}>BTW Nummer</label>
+            <input value={form.vat_number} onChange={e => set('vat_number', e.target.value)} placeholder="bv. BE0123456789" />
+          </div>
+          <div>
+            <label style={labelStyle}>Telefoonnummer</label>
+            <input value={form.billing_phone} onChange={e => set('billing_phone', e.target.value)} placeholder="+32 4xx xxx xxx" />
+          </div>
+        </div>
+        <div style={{ marginBottom: '14px' }}>
+          <label style={labelStyle}>Adres</label>
+          <input value={form.billing_address} onChange={e => set('billing_address', e.target.value)} placeholder="bv. Kerkstraat 1, 2000 Antwerpen" />
+        </div>
+        {error && <p style={{ fontSize: '0.8rem', color: 'var(--danger)', marginBottom: '10px' }}>{error}</p>}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button type="submit" disabled={loading} style={{ background: '#111', color: '#fff', border: 'none', borderRadius: '8px', padding: '9px 20px', fontSize: '0.82rem', fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1 }}>
+            {loading ? 'Opslaan...' : 'Opslaan'}
+          </button>
+          {saved && <span style={{ fontSize: '0.8rem', color: '#22C55E' }}>✓ Opgeslagen</span>}
+        </div>
+      </form>
     </div>
   )
 }
@@ -933,6 +1010,9 @@ export default function ClientDetailTabs({
 
           {/* Account sectie */}
           <AccountSection client={client} />
+
+          {/* Factuurgegevens */}
+          <BillingSection client={client} />
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
           {[

@@ -39,6 +39,11 @@ export interface Client {
   notes: string | null
   step_goal: number | null
   prev_step_goal: number | null
+  company_name: string | null
+  tav: string | null
+  vat_number: string | null
+  billing_address: string | null
+  billing_phone: string | null
   created_at: string
   updated_at: string
 }
