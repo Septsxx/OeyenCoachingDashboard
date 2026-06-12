@@ -1011,10 +1011,7 @@ export default function ClientDetailTabs({
           {/* Account sectie */}
           <AccountSection client={client} />
 
-          {/* Factuurgegevens */}
-          <BillingSection client={client} />
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
           {[
             ['Naam', client.full_name],
             ['E-mail', client.email],
@@ -1023,6 +1020,19 @@ export default function ClientDetailTabs({
             ['Geslacht', client.gender],
             ['Lengte', client.height_cm ? `${client.height_cm} cm` : null],
             ['Startgewicht', client.start_weight_kg ? `${client.start_weight_kg} kg` : null],
+          ].map(([label, value]) => value ? (
+            <div key={label as string} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px', padding: '16px' }}>
+              <p style={{ fontSize: '0.68rem', color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '4px' }}>{label as string}</p>
+              <p style={{ fontSize: '0.875rem', color: 'var(--text)' }}>{value as string}</p>
+            </div>
+          ) : null)}
+          </div>
+
+          {/* Factuurgegevens */}
+          <BillingSection client={client} />
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          {[
             ['Activiteitsniveau', client.activity_level],
             ['Trainingsdagen/week', client.training_days_per_week?.toString()],
             ['Kortetermijndoel', client.short_term_goal],
