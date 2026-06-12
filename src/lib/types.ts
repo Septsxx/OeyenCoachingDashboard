@@ -42,7 +42,9 @@ export interface Client {
   company_name: string | null
   tav: string | null
   vat_number: string | null
-  billing_address: string | null
+  billing_street: string | null
+  billing_city: string | null
+  billing_zip: string | null
   billing_phone: string | null
   created_at: string
   updated_at: string

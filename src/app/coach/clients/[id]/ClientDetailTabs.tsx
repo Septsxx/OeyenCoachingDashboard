@@ -143,7 +143,9 @@ function BillingSection({ client }: { client: Client }) {
     company_name: client.company_name ?? '',
     tav: client.tav ?? '',
     vat_number: client.vat_number ?? '',
-    billing_address: client.billing_address ?? '',
+    billing_street: client.billing_street ?? '',
+    billing_city: client.billing_city ?? '',
+    billing_zip: client.billing_zip ?? '',
     billing_phone: client.billing_phone ?? '',
   })
   const [loading, setLoading] = useState(false)
@@ -162,7 +164,9 @@ function BillingSection({ client }: { client: Client }) {
       company_name: form.company_name.trim() || null,
       tav: form.tav.trim() || null,
       vat_number: form.vat_number.trim() || null,
-      billing_address: form.billing_address.trim() || null,
+      billing_street: form.billing_street.trim() || null,
+      billing_city: form.billing_city.trim() || null,
+      billing_zip: form.billing_zip.trim() || null,
       billing_phone: form.billing_phone.trim() || null,
       updated_at: new Date().toISOString(),
     }).eq('id', client.id)
@@ -196,9 +200,19 @@ function BillingSection({ client }: { client: Client }) {
             <input value={form.billing_phone} onChange={e => set('billing_phone', e.target.value)} placeholder="+32 4xx xxx xxx" />
           </div>
         </div>
+        <div className="cols-2" style={{ marginBottom: '12px' }}>
+          <div>
+            <label style={labelStyle}>Straat</label>
+            <input value={form.billing_street} onChange={e => set('billing_street', e.target.value)} placeholder="bv. Kerkstraat 1" />
+          </div>
+          <div>
+            <label style={labelStyle}>Postcode</label>
+            <input value={form.billing_zip} onChange={e => set('billing_zip', e.target.value)} placeholder="bv. 2000" />
+          </div>
+        </div>
         <div style={{ marginBottom: '14px' }}>
-          <label style={labelStyle}>Adres</label>
-          <input value={form.billing_address} onChange={e => set('billing_address', e.target.value)} placeholder="bv. Kerkstraat 1, 2000 Antwerpen" />
+          <label style={labelStyle}>Gemeente</label>
+          <input value={form.billing_city} onChange={e => set('billing_city', e.target.value)} placeholder="bv. Antwerpen" />
         </div>
         {error && <p style={{ fontSize: '0.8rem', color: 'var(--danger)', marginBottom: '10px' }}>{error}</p>}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
