@@ -56,9 +56,9 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         zIndex: 10,
       }}>
         <img
-          src="/img/oeyen-coaching.png"
+          src="/img/Oeyen-Coaching-Logo-Coach.png"
           alt="Oeyen Coaching"
-          style={{ height: '60px', width: 'auto', filter: theme === 'dark' ? 'brightness(0) invert(1)' : 'brightness(0)', mixBlendMode: theme === 'dark' ? 'screen' : 'multiply' }}
+          style={{ height: '38px', width: 'auto', borderRadius: '4px' }}
         />
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <button
