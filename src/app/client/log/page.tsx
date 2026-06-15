@@ -27,15 +27,37 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   )
 }
 
-function ScoreSelect({ label, value, onChange, inline }: { label: string; value: string; onChange: (v: string) => void; inline?: boolean }) {
+function RatingButtons({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
     <div>
-      <label style={LABEL}>{label}{inline ? ' (1–5)' : ''}</label>
-      {!inline && <p style={{ fontSize: '0.72rem', color: 'var(--text-faint)', marginBottom: '8px', marginTop: '-4px' }}>1–5</p>}
-      <select value={value} onChange={e => onChange(e.target.value)}>
-        <option value="">—</option>
-        {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
-      </select>
+      <label style={LABEL}>{label}</label>
+      <div style={{ display: 'flex', gap: '6px', marginTop: '2px' }}>
+        {[1, 2, 3, 4, 5].map(n => {
+          const active = value === String(n)
+          return (
+            <button
+              key={n}
+              type="button"
+              onClick={() => onChange(active ? '' : String(n))}
+              style={{
+                flex: 1,
+                padding: '10px 0',
+                borderRadius: '8px',
+                border: active ? '2px solid #004aad' : '1.5px solid var(--border-2)',
+                background: active ? '#004aad' : 'transparent',
+                color: active ? '#fff' : 'var(--text-dim)',
+                fontSize: '0.88rem',
+                fontWeight: active ? 700 : 400,
+                cursor: 'pointer',
+                transition: 'all 0.12s',
+                lineHeight: 1,
+              }}
+            >
+              {n}
+            </button>
+          )
+        })}
+      </div>
     </div>
   )
 }
@@ -300,8 +322,8 @@ export default function DailyLogPage() {
 
         <Section title="Voeding">
           <div className="cols-2" style={{ marginBottom: '16px' }}>
-            <ScoreSelect label="Voedingsadherentie" value={form.nutrition_adherence} onChange={v => set('nutrition_adherence', v)} />
-            <ScoreSelect label="Hongergevoel" value={form.hunger_score} onChange={v => set('hunger_score', v)} />
+            <RatingButtons label="Voedingsadherentie" value={form.nutrition_adherence} onChange={v => set('nutrition_adherence', v)} />
+            <RatingButtons label="Hongergevoel" value={form.hunger_score} onChange={v => set('hunger_score', v)} />
           </div>
           <div className="cols-2" style={{ marginBottom: '16px' }}>
             <div>
@@ -339,8 +361,8 @@ export default function DailyLogPage() {
                 <option value="false">Nee</option>
               </select>
             </div>
-            <ScoreSelect label="Krachtprestatie" inline value={form.strength_score} onChange={v => set('strength_score', v)} />
-            <ScoreSelect label="Motivatie" inline value={form.motivation_score} onChange={v => set('motivation_score', v)} />
+            <RatingButtons label="Krachtprestatie" value={form.strength_score} onChange={v => set('strength_score', v)} />
+            <RatingButtons label="Motivatie" value={form.motivation_score} onChange={v => set('motivation_score', v)} />
           </div>
           <div>
             <label style={LABEL}>Trainingsnotities</label>
@@ -362,7 +384,7 @@ export default function DailyLogPage() {
               <label style={LABEL}>Slaapduur</label>
               <input readOnly value={sleepDisplay ?? ''} placeholder="auto" style={{ color: sleepDisplay ? 'var(--text)' : 'var(--text-faint)' }} />
             </div>
-            <ScoreSelect label="Slaapkwaliteit" inline value={form.sleep_quality} onChange={v => set('sleep_quality', v)} />
+            <RatingButtons label="Slaapkwaliteit" value={form.sleep_quality} onChange={v => set('sleep_quality', v)} />
             <div>
               <label style={LABEL}>Slaapnotities</label>
               <input value={form.sleep_notes} onChange={e => set('sleep_notes', e.target.value)} placeholder="Bv. slecht geslapen door stress" />
@@ -372,8 +394,8 @@ export default function DailyLogPage() {
 
         <Section title="Biofeedback">
           <div className="cols-2">
-            <ScoreSelect label="Energieniveau" value={form.energy_levels} onChange={v => set('energy_levels', v)} />
-            <ScoreSelect label="Stressniveau" value={form.stress_levels} onChange={v => set('stress_levels', v)} />
+            <RatingButtons label="Energieniveau" value={form.energy_levels} onChange={v => set('energy_levels', v)} />
+            <RatingButtons label="Stressniveau" value={form.stress_levels} onChange={v => set('stress_levels', v)} />
           </div>
         </Section>
 

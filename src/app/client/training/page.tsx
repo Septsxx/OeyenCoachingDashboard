@@ -37,10 +37,19 @@ export default async function ClientTrainingPage() {
 
   if (schemas.length === 0) {
     return (
-      <div style={{ textAlign: 'center', padding: '64px 16px', color: 'var(--text-faint)' }}>
-        <p style={{ fontSize: '1.5rem', marginBottom: '12px' }}>🏋️</p>
-        <p style={{ fontWeight: 600, marginBottom: '6px' }}>Nog geen trainingsschema</p>
-        <p style={{ fontSize: '0.82rem' }}>Je coach maakt binnenkort een schema voor jou aan.</p>
+      <div style={{ textAlign: 'center', padding: '72px 24px' }}>
+        <div style={{
+          width: '64px', height: '64px', borderRadius: '18px',
+          background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.2)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          margin: '0 auto 20px',
+        }}>
+          <span style={{ fontSize: '1.8rem', lineHeight: 1 }}>🏋️</span>
+        </div>
+        <p style={{ fontWeight: 700, fontSize: '1rem', marginBottom: '8px' }}>Schema komt eraan</p>
+        <p style={{ fontSize: '0.83rem', color: 'var(--text-dim)', lineHeight: 1.6, maxWidth: '260px', margin: '0 auto' }}>
+          Je coach is jouw trainingsschema aan het samenstellen. Zodra het klaar is verschijnt het hier.
+        </p>
       </div>
     )
   }

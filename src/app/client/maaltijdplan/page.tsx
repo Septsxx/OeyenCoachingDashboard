@@ -50,7 +50,20 @@ export default async function MaaltijdplanPage() {
         <Link href="/client" style={{ fontSize: '0.82rem', color: 'var(--text-dim)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '24px' }}>
           ← Terug
         </Link>
-        <p style={{ color: 'var(--text-dim)', fontSize: '0.85rem' }}>Nog geen maaltijdplan beschikbaar. Je coach stelt dit voor je in.</p>
+        <div style={{ textAlign: 'center', padding: '72px 24px' }}>
+          <div style={{
+            width: '64px', height: '64px', borderRadius: '18px',
+            background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 20px',
+          }}>
+            <span style={{ fontSize: '1.8rem', lineHeight: 1 }}>🥗</span>
+          </div>
+          <p style={{ fontWeight: 700, fontSize: '1rem', marginBottom: '8px' }}>Plan komt eraan</p>
+          <p style={{ fontSize: '0.83rem', color: 'var(--text-dim)', lineHeight: 1.6, maxWidth: '260px', margin: '0 auto' }}>
+            Je coach stelt jouw persoonlijk maaltijdplan samen. Zodra het beschikbaar is zie je het hier.
+          </p>
+        </div>
       </div>
     )
   }
