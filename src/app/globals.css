@@ -88,6 +88,21 @@ select option { background: var(--surface-2); }
   .card-pad { padding: 16px; }
 }
 
+/* Intake wizard two-panel layout */
+.intake-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 100dvh;
+}
+.intake-sidebar-panel { overflow-y: auto; }
+.intake-mobile-bar { display: none; }
+
+@media (max-width: 768px) {
+  .intake-layout { grid-template-columns: 1fr; }
+  .intake-sidebar-panel { display: none; }
+  .intake-mobile-bar { display: flex; }
+}
+
 /* Voeding food table */
 .food-table-header {
   display: grid;
