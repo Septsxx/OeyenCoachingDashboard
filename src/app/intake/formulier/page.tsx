@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 type F = {
-  full_name: string; email: string; phone: string; dob: string; gender: string
+  first_name: string; last_name: string; email: string; phone: string; dob: string; gender: string
   height_cm: string; start_weight_kg: string
   short_term_goal: string; long_term_goal: string; motivation: string; coaching_experience: string
   medical_conditions: string; injuries: string; medications: string; surgeon_clearance: boolean
@@ -13,7 +13,7 @@ type F = {
 }
 
 const INIT: F = {
-  full_name: '', email: '', phone: '', dob: '', gender: '',
+  first_name: '', last_name: '', email: '', phone: '', dob: '', gender: '',
   height_cm: '', start_weight_kg: '',
   short_term_goal: '', long_term_goal: '', motivation: '', coaching_experience: '',
   medical_conditions: '', injuries: '', medications: '', surgeon_clearance: false,
@@ -166,7 +166,8 @@ export default function IntakePage() {
 
   function validate(): string {
     if (step === 1) {
-      if (!form.full_name.trim()) return 'Vul je naam in.'
+      if (!form.first_name.trim()) return 'Vul je voornaam in.'
+      if (!form.last_name.trim()) return 'Vul je achternaam in.'
       if (!form.email.trim()) return 'Vul je e-mailadres in.'
     }
     return ''
@@ -183,7 +184,7 @@ export default function IntakePage() {
     setLoading(true)
     setSubmitError('')
     const { error } = await supabase.from('clients').insert({
-      full_name: form.full_name, email: form.email, phone: form.phone || null,
+      full_name: `${form.first_name.trim()} ${form.last_name.trim()}`, email: form.email, phone: form.phone || null,
       dob: form.dob || null, gender: form.gender || null,
       height_cm: form.height_cm ? +form.height_cm : null,
       start_weight_kg: form.start_weight_kg ? +form.start_weight_kg : null,
@@ -239,7 +240,10 @@ export default function IntakePage() {
       case 1:
         return (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-            <div><FL>Volledige naam *</FL><TI value={form.full_name} onChange={e => set('full_name', e.target.value)} placeholder="Jan Janssen" /></div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+              <div><FL>Voornaam *</FL><TI value={form.first_name} onChange={e => set('first_name', e.target.value)} placeholder="Jan" /></div>
+              <div><FL>Achternaam *</FL><TI value={form.last_name} onChange={e => set('last_name', e.target.value)} placeholder="Janssen" /></div>
+            </div>
             <div><FL>E-mailadres *</FL><TI type="email" value={form.email} onChange={e => set('email', e.target.value)} placeholder="jan@email.com" /></div>
             <div><FL>Telefoonnummer</FL><TI value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="+32 4xx xxx xxx" /></div>
           </div>
