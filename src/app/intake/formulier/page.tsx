@@ -224,7 +224,7 @@ export default function IntakePage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <div style={{ padding: '20px 22px', borderRadius: '14px', background: '#F5F8FF', border: '1px solid rgba(0,74,173,0.15)', marginBottom: '4px' }}>
               <p style={{ margin: 0, fontSize: '0.95rem', color: '#333', lineHeight: 1.7 }}>
-                Hoe <strong style={{ color: '#004aad' }}>duidelijker en vollediger</strong> je dit formulier invult, hoe beter en sneller Dimitri je kan helpen met opstarten. Neem even de tijd — het loont.
+                Hoe <strong style={{ color: '#004aad' }}>duidelijker en vollediger</strong> je dit formulier invult, hoe beter en sneller Dimitri je kan helpen met opstarten. Neem even de tijd, het loont.
               </p>
             </div>
             {[
