@@ -67,6 +67,32 @@ export default async function ClientDashboard() {
   const firstName = clientRow.full_name.split(' ')[0]
   const dateLabel = new Date().toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })
 
+  const STREAK_MILESTONES: Record<number, { title: string; message: string; color: string; bg: string; border: string }> = {
+    7: {
+      title: '1 week op rij! 🔥',
+      message: 'Na 7 dagen herhaling begint je brein al nieuwe neurale verbindingen te vormen. Consistentie in de eerste week is de sterkste voorspeller van een duurzame gewoonte.',
+      color: '#F97316',
+      bg: 'rgba(249,115,22,0.08)',
+      border: 'rgba(249,115,22,0.3)',
+    },
+    14: {
+      title: '2 weken op rij! ⚡',
+      message: 'Je dopaminesysteem begint de dagelijkse routine te anticiperen vóór je hem uitvoert — een teken dat de gewoonte wortel schiet in je brein.',
+      color: '#8B5CF6',
+      bg: 'rgba(139,92,246,0.08)',
+      border: 'rgba(139,92,246,0.3)',
+    },
+    30: {
+      title: '30 dagen op rij! 🏆',
+      message: 'Onderzoek van Lally et al. (UCL, 2010) toont aan dat gewoonten gemiddeld 66 dagen nodig hebben om automatisch te worden. Jij bent halverwege — dit is echte progressie.',
+      color: '#22C55E',
+      bg: 'rgba(34,197,94,0.08)',
+      border: 'rgba(34,197,94,0.3)',
+    },
+  }
+
+  const milestone = STREAK_MILESTONES[streak] ?? null
+
   return (
     <div>
       {/* Greeting */}
@@ -87,6 +113,22 @@ export default async function ClientDashboard() {
             <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#F97316' }}>
               {streak} dagen op rij
             </span>
+          </div>
+        )}
+        {milestone && (
+          <div style={{
+            marginTop: '16px',
+            background: milestone.bg,
+            border: `1px solid ${milestone.border}`,
+            borderRadius: '14px',
+            padding: '16px 18px',
+          }}>
+            <p style={{ fontSize: '0.95rem', fontWeight: 700, color: milestone.color, marginBottom: '6px' }}>
+              {milestone.title}
+            </p>
+            <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+              {milestone.message}
+            </p>
           </div>
         )}
       </div>
