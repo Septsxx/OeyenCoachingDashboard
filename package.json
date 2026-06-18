@@ -1,0 +1,38 @@
+{
+  "name": "oeyen-coaching",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 7778",
+    "dev:coach": "cross-env NEXT_DIST_DIR=.next-coach next dev -p 7771",
+    "dev:client": "cross-env NEXT_DIST_DIR=.next-client next dev -p 7778",
+    "dev:all": "concurrently \"npm run dev:coach\" \"npm run dev:client\"",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.10.2",
+    "@supabase/supabase-js": "^2.105.3",
+    "date-fns": "^4.1.0",
+    "googleapis": "^171.4.0",
+    "lucide-react": "^1.14.0",
+    "next": "16.2.5",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "recharts": "^3.8.1",
+    "resend": "^6.12.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.5",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
