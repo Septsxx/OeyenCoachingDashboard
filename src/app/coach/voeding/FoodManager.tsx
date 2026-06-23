@@ -65,7 +65,6 @@ function FoodForm({
           ['protein_per_100g', 'Eiwitten (g)'],
           ['carbs_per_100g', 'KH (g)'],
           ['fat_per_100g', 'Vetten (g)'],
-          ['fiber_per_100g', 'Vezels (g)'],
           ['serving_size_g', 'Port. (g)'],
         ].map(([field, label]) => (
           <div key={field}>
