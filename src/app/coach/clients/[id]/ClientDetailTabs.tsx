@@ -263,6 +263,9 @@ export default function ClientDetailTabs({
   const [prevStepGoal, setPrevStepGoal] = useState<number | null>(client.prev_step_goal)
   const [editingStepGoal, setEditingStepGoal] = useState(false)
   const [stepGoalInput, setStepGoalInput] = useState(client.step_goal != null ? String(client.step_goal) : '')
+  const [coachNotes, setCoachNotes] = useState(client.notes ?? '')
+  const [coachNotesSaved, setCoachNotesSaved] = useState(true)
+  const [savingCoachNotes, setSavingCoachNotes] = useState(false)
   const [timelineMap, setTimelineMap] = useState<Map<number, WeeklyTimeline>>(() => {
     const m = new Map<number, WeeklyTimeline>()
     initialTimeline.forEach(t => m.set(t.week_number, t))
@@ -393,6 +396,17 @@ export default function ClientDetailTabs({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ clientId: client.id, stepGoal: num, prevStepGoal: newPrev }),
     })
+  }
+
+  async function saveCoachNotes() {
+    setSavingCoachNotes(true)
+    await fetch('/api/coach/clients/notes', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId: client.id, notes: coachNotes }),
+    })
+    setSavingCoachNotes(false)
+    setCoachNotesSaved(true)
   }
 
   const latestPayment = payments[0] ?? null
@@ -531,6 +545,27 @@ export default function ClientDetailTabs({
               </div>
             </div>
           )}
+
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '20px', marginTop: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <p style={{ fontSize: '0.7rem', color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+                Coach notities <span style={{ textTransform: 'none', letterSpacing: 0 }}>— enkel zichtbaar voor jou</span>
+              </p>
+              {!coachNotesSaved && (
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-faint)' }}>
+                  {savingCoachNotes ? 'Opslaan...' : 'Niet opgeslagen'}
+                </span>
+              )}
+            </div>
+            <textarea
+              value={coachNotes}
+              onChange={e => { setCoachNotes(e.target.value); setCoachNotesSaved(false) }}
+              onBlur={() => !coachNotesSaved && saveCoachNotes()}
+              placeholder="Persoonlijke notities over deze klant (nooit zichtbaar voor de klant zelf)..."
+              rows={4}
+              style={{ width: '100%', resize: 'vertical', fontSize: '0.85rem', color: 'var(--text)', background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: '8px', padding: '10px 12px', fontFamily: 'inherit' }}
+            />
+          </div>
         </div>
       )}
 
@@ -1086,7 +1121,6 @@ export default function ClientDetailTabs({
             ['Medicatie', client.medications],
             ['Huidig eetpatroon', client.current_diet],
             ['Voedselallergieën', client.food_allergies],
-            ['Coach notities', client.notes],
           ].map(([label, value]) => value ? (
             <div key={label as string} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px', padding: '16px' }}>
               <p style={{ fontSize: '0.68rem', color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '4px' }}>{label as string}</p>
