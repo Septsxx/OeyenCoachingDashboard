@@ -1060,7 +1060,7 @@ export default function ClientDetailTabs({
             ['Naam', client.full_name],
             ['E-mail', client.email],
             ['Telefoon', client.phone],
-            ['Geboortedatum', client.dob],
+            ['Geboortedatum', client.dob ? client.dob.slice(0, 10).split('-').reverse().join('/') : null],
             ['Geslacht', client.gender],
             ['Lengte', client.height_cm ? `${client.height_cm} cm` : null],
             ['Startgewicht', client.start_weight_kg ? `${client.start_weight_kg} kg` : null],
