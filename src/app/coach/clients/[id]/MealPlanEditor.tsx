@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { MealPlan, MealPlanItem, Food } from '@/lib/types'
+import { calcMacros } from '@/lib/macros'
 import { LABEL, BTN_PRIMARY, BTN_GHOST } from '@/lib/ui'
 import { Plus, Trash2, Search, Pencil } from 'lucide-react'
 
@@ -54,16 +55,6 @@ type ItemDraft = {
 function formatQty(quantity: number, unit: string) {
   if (unit === 'stuk') return `${quantity} stuk${quantity === 1 ? '' : 's'}`
   return `${quantity}${unit}`
-}
-
-function calcMacros(food: Food, qty: number) {
-  const f = food.unit === 'stuk' ? qty : qty / 100
-  return {
-    kcal: Math.round(food.calories_per_100g * f),
-    pro: +(food.protein_per_100g * f).toFixed(1),
-    cho: +(food.carbs_per_100g * f).toFixed(1),
-    fat: +(food.fat_per_100g * f).toFixed(1),
-  }
 }
 
 function FoodSearchDropdown({ foods, onSelect }: { foods: Food[]; onSelect: (f: Food) => void }) {

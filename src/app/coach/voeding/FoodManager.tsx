@@ -2,8 +2,9 @@
 import { useState, useMemo, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import type { Food, FoodCategory } from '@/lib/types'
+import type { Food, FoodCategory, MealPlanItem } from '@/lib/types'
 import { FOOD_CATEGORIES } from '@/lib/types'
+import { calcMacros } from '@/lib/macros'
 import { BTN_PRIMARY, BTN_GHOST, LABEL } from '@/lib/ui'
 import { Plus, Search, Pencil, Trash2, X, Check, ExternalLink } from 'lucide-react'
 
@@ -256,7 +257,24 @@ export default function FoodManager({ initialFoods }: { initialFoods: Food[] }) 
     setSaving(true)
     const { data, error } = await supabase.from('foods').update(formToPayload(editForm)).eq('id', editId).select().single()
     if (!error && data) {
-      setFoods(prev => prev.map(f => f.id === editId ? data as Food : f))
+      const updatedFood = data as Food
+      setFoods(prev => prev.map(f => f.id === editId ? updatedFood : f))
+
+      const { data: items } = await supabase.from('meal_plan_items').select('*').eq('food_id', editId)
+      if (items && items.length > 0) {
+        await Promise.all((items as MealPlanItem[]).map(item => {
+          const m = calcMacros(updatedFood, item.quantity ?? 0)
+          return supabase.from('meal_plan_items').update({
+            food_item: updatedFood.name,
+            unit: updatedFood.unit,
+            calories: m.kcal,
+            protein_g: m.pro,
+            carbs_g: m.cho,
+            fat_g: m.fat,
+          }).eq('id', item.id)
+        }))
+      }
+
       setEditId(null)
     }
     setSaving(false)
