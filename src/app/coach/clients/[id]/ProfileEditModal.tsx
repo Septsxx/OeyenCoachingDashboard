@@ -18,6 +18,7 @@ export default function ProfileEditModal({ client, onClose }: { client: Client; 
   const [currentDiet, setCurrentDiet] = useState(client.current_diet ?? '')
   const [foodAllergies, setFoodAllergies] = useState(client.food_allergies ?? '')
   const [trainingDays, setTrainingDays] = useState(client.training_days_per_week?.toString() ?? '')
+  const [startWeight, setStartWeight] = useState(client.start_weight_kg?.toString() ?? '')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -34,6 +35,7 @@ export default function ProfileEditModal({ client, onClose }: { client: Client; 
       current_diet: currentDiet.trim() || null,
       food_allergies: foodAllergies.trim() || null,
       training_days_per_week: trainingDays ? parseInt(trainingDays, 10) : null,
+      start_weight_kg: startWeight ? parseFloat(startWeight) : null,
       updated_at: new Date().toISOString(),
     }).eq('id', client.id)
     setLoading(false)
@@ -67,9 +69,9 @@ export default function ProfileEditModal({ client, onClose }: { client: Client; 
         {field('Geslacht', (
           <select value={gender} onChange={e => setGender(e.target.value)}>
             <option value="">— Selecteer —</option>
-            <option value="Man">Man</option>
-            <option value="Vrouw">Vrouw</option>
-            <option value="Anders">Anders</option>
+            <option value="man">Man</option>
+            <option value="vrouw">Vrouw</option>
+            <option value="anders">Anders</option>
           </select>
         ))}
         {field('Trainingsdagen / week', (
@@ -77,6 +79,13 @@ export default function ProfileEditModal({ client, onClose }: { client: Client; 
             type="number" min={0} max={7} value={trainingDays}
             onChange={e => setTrainingDays(e.target.value)}
             placeholder="bv. 4"
+          />
+        ))}
+        {field('Startgewicht (kg)', (
+          <input
+            type="number" step="0.1" min={0} value={startWeight}
+            onChange={e => setStartWeight(e.target.value)}
+            placeholder="bv. 82.5"
           />
         ))}
       </div>
