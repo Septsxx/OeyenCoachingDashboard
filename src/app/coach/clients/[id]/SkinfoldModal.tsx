@@ -6,13 +6,32 @@ import { format } from 'date-fns'
 import ModalWrapper from '@/components/ModalWrapper'
 import { LABEL, BTN_PRIMARY, BTN_GHOST, GRID2 } from '@/lib/ui'
 
-function calcBF(biceps: number, triceps: number, subscapular: number, suprailiac: number, age: number): number {
+const DW_COEFFICIENTS = {
+  man: [
+    { max: 19, c: 1.1620, m: 0.0630 },
+    { max: 29, c: 1.1631, m: 0.0632 },
+    { max: 39, c: 1.1422, m: 0.0544 },
+    { max: 49, c: 1.1620, m: 0.0700 },
+    { max: Infinity, c: 1.1715, m: 0.0779 },
+  ],
+  vrouw: [
+    { max: 19, c: 1.1549, m: 0.0678 },
+    { max: 29, c: 1.1599, m: 0.0717 },
+    { max: 39, c: 1.1423, m: 0.0632 },
+    { max: 49, c: 1.1333, m: 0.0612 },
+    { max: Infinity, c: 1.1339, m: 0.0645 },
+  ],
+}
+
+function calcBF(biceps: number, triceps: number, subscapular: number, suprailiac: number, age: number, gender?: string | null): number {
   const sum = biceps + triceps + subscapular + suprailiac
-  const density = 1.1631 - 0.0632 * Math.log(sum)
+  const table = gender === 'vrouw' ? DW_COEFFICIENTS.vrouw : DW_COEFFICIENTS.man
+  const { c, m } = table.find(row => age <= row.max) ?? table[table.length - 1]
+  const density = c - m * Math.log10(sum)
   return +(((4.95 / density) - 4.5) * 100).toFixed(2)
 }
 
-export default function SkinfoldModal({ clientId, onClose }: { clientId: string; onClose: () => void }) {
+export default function SkinfoldModal({ clientId, gender, onClose }: { clientId: string; gender?: string | null; onClose: () => void }) {
   const router = useRouter()
   const supabase = createClient()
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'))
@@ -25,7 +44,7 @@ export default function SkinfoldModal({ clientId, onClose }: { clientId: string;
   const [loading, setLoading] = useState(false)
 
   const allFilled = biceps && triceps && subscapular && suprailiac && age
-  const bf = allFilled ? calcBF(+biceps, +triceps, +subscapular, +suprailiac, +age) : null
+  const bf = allFilled ? calcBF(+biceps, +triceps, +subscapular, +suprailiac, +age, gender) : null
   const sum = allFilled ? +biceps + +triceps + +subscapular + +suprailiac : null
 
   async function handleSave() {

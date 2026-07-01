@@ -8,7 +8,7 @@ import { Plus, Trash2, Search, Pencil } from 'lucide-react'
 
 type MacroDay = 'td' | 'rd' | 'low'
 const DAY_LABELS: Record<MacroDay, string> = { td: 'Trainingsdag (TD)', rd: 'Rustdag (RD)', low: 'Lowdag (LOW)' }
-const MEAL_NAMES = ['Ontbijt', 'Pre-workout', 'Post-workout', 'Maaltijd 2', 'Snack', 'Maaltijd 3', 'Maaltijd 4']
+const MEAL_NAMES = ['Ontbijt', 'Pre-workout', 'Post-workout', 'Maaltijd 2', 'Snack', 'Maaltijd 3', 'Maaltijd 4', 'Maaltijd 5']
 
 function MacroSection({ day, plan, onChange }: {
   day: MacroDay

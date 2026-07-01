@@ -1072,7 +1072,7 @@ export default function ClientDetailTabs({
         <PaymentModal clientId={client.id} onClose={() => setShowPaymentModal(false)} />
       )}
       {showSkinfoldModal && (
-        <SkinfoldModal clientId={client.id} onClose={() => setShowSkinfoldModal(false)} />
+        <SkinfoldModal clientId={client.id} gender={client.gender} onClose={() => setShowSkinfoldModal(false)} />
       )}
       {checkinToAnswer && (
         <CheckinResponseModal checkin={checkinToAnswer} onClose={() => setCheckinToAnswer(null)} />
