@@ -51,8 +51,13 @@ type ItemDraft = {
   meal_name: string
 }
 
+function formatQty(quantity: number, unit: string) {
+  if (unit === 'stuk') return `${quantity} stuk${quantity === 1 ? '' : 's'}`
+  return `${quantity}${unit}`
+}
+
 function calcMacros(food: Food, qty: number) {
-  const f = qty / 100
+  const f = food.unit === 'stuk' ? qty : qty / 100
   return {
     kcal: Math.round(food.calories_per_100g * f),
     pro: +(food.protein_per_100g * f).toFixed(1),
@@ -270,7 +275,7 @@ function MealBuilder({ mealPlanId, dayType, foods, initialItems, targets }: {
                       style={{ width: '72px', fontSize: '0.82rem', padding: '4px 8px' }}
                       autoFocus
                     />
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>{item.unit}</span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>{item.unit === 'stuk' ? 'stuk(s)' : item.unit}</span>
                   </div>
                   <select value={editMeal} onChange={e => setEditMeal(+e.target.value)} style={{ fontSize: '0.78rem', padding: '4px 8px' }}>
                     {MEAL_NAMES.map((name, i) => <option key={i} value={i + 1}>{name}</option>)}
@@ -284,7 +289,7 @@ function MealBuilder({ mealPlanId, dayType, foods, initialItems, targets }: {
               ) : (
                 <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '7px 0', borderBottom: '1px solid var(--border)' }}>
                   <span style={{ flex: 1, fontSize: '0.82rem' }}>{item.food_item}</span>
-                  <span style={{ fontSize: '0.78rem', color: 'var(--text-dim)', minWidth: '60px', textAlign: 'right' }}>{item.quantity}{item.unit}</span>
+                  <span style={{ fontSize: '0.78rem', color: 'var(--text-dim)', minWidth: '60px', textAlign: 'right' }}>{formatQty(item.quantity ?? 0, item.unit)}</span>
                   <span style={{ fontSize: '0.78rem', minWidth: '50px', textAlign: 'right' }}>{item.calories} kcal</span>
                   <button onClick={() => startEdit(item)} style={{ ...BTN_GHOST, padding: '3px', lineHeight: 0 }}>
                     <Pencil size={12} />
@@ -313,7 +318,7 @@ function MealBuilder({ mealPlanId, dayType, foods, initialItems, targets }: {
           )}
         </div>
         <div style={{ minWidth: '90px' }}>
-          <label style={LABEL}>Hoeveelheid (g)</label>
+          <label style={LABEL}>{pendingFood?.unit === 'stuk' ? 'Aantal' : 'Hoeveelheid (g)'}</label>
           <input type="number" min="1" value={pendingQty} onChange={e => setPendingQty(+e.target.value)} />
         </div>
         <div style={{ minWidth: '130px' }}>

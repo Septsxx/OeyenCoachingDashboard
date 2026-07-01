@@ -177,7 +177,7 @@ export interface Food {
   fat_per_100g: number
   fiber_per_100g: number | null
   serving_size_g: number | null
-  unit: 'g' | 'ml'
+  unit: 'g' | 'ml' | 'stuk'
   off_source: string | null
   is_active: boolean
   created_at: string

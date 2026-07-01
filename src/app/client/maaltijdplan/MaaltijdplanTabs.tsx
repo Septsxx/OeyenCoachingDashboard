@@ -5,6 +5,11 @@ import type { MealPlan, MealPlanItem } from '@/lib/types'
 const DAY_LABELS: Record<string, string> = { TD: 'Trainingsdag', RD: 'Rustdag', LOW: 'Low dag' }
 const DAY_COLORS: Record<string, string> = { TD: '#004aad', RD: '#22C55E', LOW: '#F59E0B' }
 
+function formatQty(quantity: number, unit: string) {
+  if (unit === 'stuk') return `${quantity} stuk${quantity === 1 ? '' : 's'}`
+  return `${quantity}${unit}`
+}
+
 function MacroRow({ label, value, color }: { label: string; value: number | null; color: string }) {
   if (!value) return null
   return (
@@ -123,7 +128,7 @@ export default function MaaltijdplanTabs({ plan, items }: { plan: MealPlan; item
                   <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 16px', borderBottom: '1px solid var(--surface-2)' }}>
                     <span style={{ fontSize: '0.82rem', color: 'var(--text)' }}>{item.food_item}</span>
                     <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                      <span style={{ fontSize: '0.78rem', color: 'var(--text-dim)' }}>{item.quantity}{item.unit}</span>
+                      <span style={{ fontSize: '0.78rem', color: 'var(--text-dim)' }}>{formatQty(item.quantity ?? 0, item.unit)}</span>
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-faint)', minWidth: '52px', textAlign: 'right' }}>{item.calories} kcal</span>
                     </div>
                   </div>

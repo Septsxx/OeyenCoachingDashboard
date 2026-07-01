@@ -311,7 +311,7 @@ CREATE TABLE foods (
   fat_per_100g NUMERIC(6,2) NOT NULL DEFAULT 0,
   fiber_per_100g NUMERIC(6,2) DEFAULT 0,
   serving_size_g NUMERIC(6,1) DEFAULT 100,
-  unit TEXT DEFAULT 'g' CHECK (unit IN ('g', 'ml')),
+  unit TEXT DEFAULT 'g' CHECK (unit IN ('g', 'ml', 'stuk')),
   off_source TEXT,
   is_active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMPTZ DEFAULT NOW(),

@@ -10,7 +10,7 @@ import { Plus, Search, Pencil, Trash2, X, Check, ExternalLink } from 'lucide-rea
 const EMPTY_FORM = {
   name: '', brand: '', category: '' as FoodCategory | '',
   calories_per_100g: '', protein_per_100g: '', carbs_per_100g: '',
-  fat_per_100g: '', fiber_per_100g: '', serving_size_g: '100', unit: 'g' as 'g' | 'ml',
+  fat_per_100g: '', fiber_per_100g: '', serving_size_g: '100', unit: 'g' as 'g' | 'ml' | 'stuk',
 }
 
 type FormState = typeof EMPTY_FORM
@@ -55,9 +55,17 @@ function FoodForm({
             ))}
           </select>
         </div>
+        <div>
+          <label style={LABEL}>Eenheid</label>
+          <select value={form.unit} onChange={e => onChange('unit', e.target.value)}>
+            <option value="g">Gram</option>
+            <option value="ml">Milliliter</option>
+            <option value="stuk">Stuk (bv. ei, rijstwafel)</option>
+          </select>
+        </div>
       </div>
       <p style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>
-        Macro's per 100g
+        {form.unit === 'stuk' ? "Macro's per stuk" : "Macro's per 100g"}
       </p>
       <div className="food-macro-grid">
         {[
@@ -65,7 +73,7 @@ function FoodForm({
           ['protein_per_100g', 'Eiwitten (g)'],
           ['carbs_per_100g', 'KH (g)'],
           ['fat_per_100g', 'Vetten (g)'],
-          ['serving_size_g', 'Port. (g)'],
+          ['serving_size_g', form.unit === 'stuk' ? 'Standaard aantal' : 'Port. (g)'],
         ].map(([field, label]) => (
           <div key={field}>
             <label style={LABEL}>{label}</label>
