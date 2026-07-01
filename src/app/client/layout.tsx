@@ -1,10 +1,9 @@
-﻿'use client'
+'use client'
 import { useRouter, usePathname } from 'next/navigation'
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Home, Activity, Pill, Utensils, Dumbbell, Ruler, Sun, Moon, LogOut } from 'lucide-react'
-import NotificationSettings from '@/components/NotificationSettings'
 
 const NAV = [
   { href: '/client', label: 'Home', Icon: Home },
@@ -63,7 +62,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           style={{ height: '38px', width: 'auto', borderRadius: '4px' }}
         />
         <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-          <NotificationSettings />
           <button
             onClick={toggleTheme}
             title={theme === 'dark' ? 'Licht thema' : 'Donker thema'}
