@@ -276,6 +276,7 @@ export default function ClientDetailTabs({
   const [phaseLabels, setPhaseLabels] = useState<Partial<Record<PhaseKey, string>>>(initialPhaseLabels)
   const [editingLabels, setEditingLabels] = useState(false)
   const [labelDrafts, setLabelDrafts] = useState<Record<PhaseKey, string>>({ ...DEFAULT_PHASE_LABELS, ...initialPhaseLabels })
+  const [addingWeek, setAddingWeek] = useState(false)
 
   const phaseLabel = (key: PhaseKey) => phaseLabels[key] ?? DEFAULT_PHASE_LABELS[key]
 
@@ -347,18 +348,38 @@ export default function ClientDetailTabs({
       if (l.steps) d.steps.push(l.steps)
       if (l.cardio_minutes) d.cardio.push(l.cardio_minutes)
     })
-    const sorted = Array.from(byWeek.entries()).sort((a, b) => a[0] - b[0])
-    return sorted.map(([weekNum, d], i) => {
-      const avgBw = d.weights.length ? +(d.weights.reduce((a, b) => a + b) / d.weights.length).toFixed(1) : null
-      const prevWeek = i > 0 ? sorted[i - 1][1] : null
-      const prevAvgBw = prevWeek && prevWeek.weights.length ? +(prevWeek.weights.reduce((a, b) => a + b) / prevWeek.weights.length).toFixed(1) : null
+    const allWeeks = new Set<number>([...Array.from(byWeek.keys()), ...Array.from(timelineMap.keys())])
+    const sorted = Array.from(allWeeks).sort((a, b) => a - b)
+    return sorted.map((weekNum, i) => {
+      const d = byWeek.get(weekNum)
+      const avgBw = d && d.weights.length ? +(d.weights.reduce((a, b) => a + b) / d.weights.length).toFixed(1) : null
+      const prevWeekNum = i > 0 ? sorted[i - 1] : null
+      const prevD = prevWeekNum != null ? byWeek.get(prevWeekNum) : null
+      const prevAvgBw = prevD && prevD.weights.length ? +(prevD.weights.reduce((a, b) => a + b) / prevD.weights.length).toFixed(1) : null
       const bwDelta = avgBw !== null && prevAvgBw !== null ? +(avgBw - prevAvgBw).toFixed(1) : null
-      const weekStart = d.dates.length ? [...d.dates].sort()[0] : null
-      const avgSteps = d.steps.length ? Math.round(d.steps.reduce((a, b) => a + b) / d.steps.length) : null
-      const totalCardio = d.cardio.length ? d.cardio.reduce((a, b) => a + b) : null
+      const weekStart = d && d.dates.length ? [...d.dates].sort()[0] : null
+      const avgSteps = d && d.steps.length ? Math.round(d.steps.reduce((a, b) => a + b) / d.steps.length) : null
+      const totalCardio = d && d.cardio.length ? d.cardio.reduce((a, b) => a + b) : null
       return { weekNum, weekStart, avgBw, bwDelta, avgSteps, totalCardio }
     })
   })()
+
+  async function addWeek() {
+    setAddingWeek(true)
+    const maxWeek = timelineRows.length > 0 ? Math.max(...timelineRows.map(r => r.weekNum)) : 0
+    const newWeekNum = maxWeek + 1
+    await fetch('/api/coach/clients/timeline', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId: client.id, weekNumber: newWeekNum }),
+    })
+    setTimelineMap(prev => {
+      const next = new Map(prev)
+      next.set(newWeekNum, { id: '', client_id: client.id, week_number: newWeekNum, phase: null, energy_balance: null, calories_td: null, calories_ntd: null, cardio_target: null, steps_target: null, notes: null, created_at: '', updated_at: '' })
+      return next
+    })
+    setAddingWeek(false)
+  }
 
   async function saveStepGoal(raw: string) {
     const num = raw === '' ? null : parseInt(raw, 10)
@@ -537,9 +558,18 @@ export default function ClientDetailTabs({
                 </div>
               </div>
             ) : (
-              <button onClick={() => setEditingLabels(true)} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: '7px', padding: '6px 14px', fontSize: '0.78rem', cursor: 'pointer', color: 'var(--text-muted)' }}>
-                Fases aanpassen
-              </button>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  onClick={addWeek}
+                  disabled={addingWeek}
+                  style={{ background: '#004aad', color: '#fff', border: 'none', borderRadius: '7px', padding: '6px 14px', fontSize: '0.78rem', fontWeight: 600, cursor: addingWeek ? 'not-allowed' : 'pointer', opacity: addingWeek ? 0.7 : 1 }}
+                >
+                  {addingWeek ? 'Toevoegen...' : '+ Week toevoegen'}
+                </button>
+                <button onClick={() => setEditingLabels(true)} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: '7px', padding: '6px 14px', fontSize: '0.78rem', cursor: 'pointer', color: 'var(--text-muted)' }}>
+                  Fases aanpassen
+                </button>
+              </div>
             )}
           </div>
 

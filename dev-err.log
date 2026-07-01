@@ -1,0 +1,32 @@
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\Verhe\Documents\AIProject\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\Verhe\Documents\AIProject\oeyen-coaching\package-lock.json
+
+⚠ Turbopack's filesystem cache has been deleted because we previously detected an internal error in Turbopack. Builds or page loads may be slower as a result.
+Error [AuthApiError]: Invalid Refresh Token: Refresh Token Not Found
+    at ignore-listed frames {
+  __isAuthError: true,
+  status: 400,
+  code: 'refresh_token_not_found'
+}
+Error [AuthApiError]: Invalid Refresh Token: Refresh Token Not Found
+    at ignore-listed frames {
+  __isAuthError: true,
+  status: 400,
+  code: 'refresh_token_not_found'
+}
+Error [AuthApiError]: Invalid Refresh Token: Refresh Token Not Found
+    at ignore-listed frames {
+  __isAuthError: true,
+  status: 400,
+  code: 'refresh_token_not_found'
+}
+Error [AuthApiError]: Invalid Refresh Token: Refresh Token Not Found
+    at ignore-listed frames {
+  __isAuthError: true,
+  status: 400,
+  code: 'refresh_token_not_found'
+}

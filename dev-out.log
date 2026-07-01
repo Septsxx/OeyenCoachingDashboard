@@ -1,0 +1,24 @@
+
+> oeyen-coaching@0.1.0 dev
+> next dev -p 7778
+
+▲ Next.js 16.2.5 (Turbopack)
+- Local:         http://localhost:7778
+- Network:       http://172.22.0.1:7778
+- Environments: .env.local
+✓ Ready in 1607ms
+
+○ Compiling /nieuwe-homepage ...
+ GET /nieuwe-homepage 200 in 236ms (next.js: 12ms, proxy.ts: 86ms, application-code: 138ms)
+ GET /nieuwe-homepage 200 in 115ms (next.js: 9ms, proxy.ts: 10ms, application-code: 97ms)
+ GET /nieuwe-homepage 200 in 518ms (next.js: 19ms, proxy.ts: 408ms, application-code: 91ms)
+ GET /nieuwe-homepage 200 in 336ms (next.js: 11ms, proxy.ts: 231ms, application-code: 94ms)
+ GET /nieuwe-homepage 200 in 538ms (next.js: 177ms, proxy.ts: 191ms, application-code: 170ms)
+ GET /nieuwe-homepage 200 in 196ms (next.js: 23ms, proxy.ts: 22ms, application-code: 151ms)
+ GET /nieuwe-homepage 200 in 147ms (next.js: 20ms, proxy.ts: 26ms, application-code: 101ms)
+✓ Compiled in 471ms
+ GET /nieuwe-homepage 200 in 1129ms (next.js: 422ms, proxy.ts: 342ms, application-code: 365ms)
+ GET /nieuwe-homepage 200 in 119ms (next.js: 8ms, proxy.ts: 8ms, application-code: 103ms)
+ GET /nieuwe-homepage 200 in 141ms (next.js: 14ms, proxy.ts: 13ms, application-code: 114ms)
+ GET /nieuwe-homepage 200 in 199ms (next.js: 27ms, proxy.ts: 26ms, application-code: 146ms)
+ GET /nieuwe-homepage 200 in 1075ms (next.js: 392ms, proxy.ts: 277ms, application-code: 406ms)
